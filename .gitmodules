@@ -1,0 +1,3 @@
+[submodule "MyCP_libraries"]
+	path = MyCP_libraries
+	url = https://github.com/vincenzozimb/MyCP_libraries.git

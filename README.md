@@ -42,7 +42,7 @@ make -j
 
 Prova $\LaTeX$
 
-> $ \mathcal{L}_{QED} = \bar{\psi}(i\gamma^\mu \partial_\mu - m)\psi -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} -ie\bar{\psi}\gamma^\mu\psi A_\mu$
+> $ \frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot{q}}-\frac{\partial \mathcal{L}}{\partial q}=0$
 
 ---
 
