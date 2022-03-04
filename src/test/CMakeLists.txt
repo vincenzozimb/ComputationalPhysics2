@@ -1,0 +1,11 @@
+add_executable(test test.c)
+
+target_compile_options(test PRIVATE -Wall -O3 -march=native -ffast-math)
+
+target_link_libraries(test m myCP-lib)
+
+add_custom_target(run-test
+    COMMAND test
+    DEPENDS test 
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
