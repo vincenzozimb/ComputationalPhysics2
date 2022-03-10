@@ -6,7 +6,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 
 # List here the directories in extern
-add_subdirectory(extern/MyCP_libraries)
 
 
 # List here the directories in src
