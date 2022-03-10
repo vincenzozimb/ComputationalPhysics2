@@ -2,7 +2,7 @@ add_executable(test test.c)
 
 target_compile_options(test PRIVATE -Wall -O3 -march=native -ffast-math)
 
-target_link_libraries(test m myCP-lib)
+target_link_libraries(test m)
 
 add_custom_target(run-test
     COMMAND test
