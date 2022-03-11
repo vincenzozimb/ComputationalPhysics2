@@ -16,5 +16,5 @@ include_directories(PUBLIC
 
 
 # List here the directories in src
-add_subdirectory(src/test)
-add_subdirectory(src/lennardjones)
+add_subdirectory(projects/test)
+add_subdirectory(projects/lj_scatt)
