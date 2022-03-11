@@ -2,7 +2,6 @@
 
  Git repository for the course "Computational Physics", master degree in Physics at UniTN.
 
-
 ## Course website
 
 Click this [link](https://didatticaonline.unitn.it/dol/course/view.php?id=34003) to open the course web page on moodle.
@@ -10,14 +9,13 @@ Click this [link](https://didatticaonline.unitn.it/dol/course/view.php?id=34003)
 ## Repository contents
 
 > The folder `projects` contains the various exercises, each in its own subfolder.
-
 > The folder `myfunc` consists in a library with some functions to be used in all the exercises.
 
 ---
 
 ## Instructions to run the code
 
-Open the terminal in the folder containing this README, and execute the following code: 
+Open the terminal in the folder containing this README, and execute the following code:
 
 ```C
 mkdir build
