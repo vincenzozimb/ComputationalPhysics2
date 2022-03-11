@@ -9,6 +9,7 @@ Click this [link](https://didatticaonline.unitn.it/dol/course/view.php?id=34003)
 ## Repository contents
 
 > The folder `projects` contains the various exercises, each in its own subfolder.
+>
 > The folder `myfunc` consists in a library with some functions to be used in all the exercises.
 
 ---
