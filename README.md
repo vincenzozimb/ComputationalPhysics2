@@ -32,7 +32,7 @@ Then execute the instructions for the single projects, always remaining in the `
 ## Project 0: test
 
 ```C
-make run-es4
+make run-test
 ```
 
 ---
