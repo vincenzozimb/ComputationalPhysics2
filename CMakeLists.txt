@@ -17,4 +17,4 @@ include_directories(PUBLIC
 
 # List here the directories in projects
 add_subdirectory(projects/test)
-add_subdirectory(projects/lj_scatt)
+add_subdirectory(projects/Ex1)
