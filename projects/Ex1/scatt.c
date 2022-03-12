@@ -14,13 +14,13 @@ int main(){
 
     /* problem parameters */
     Param par;
-    par.xi = 1.0;
-    par.E = 1.8;
+    par.xi = 0.25;
+    par.E = 0.5;
 
     double k = sqrt(par.E / par.xi);
 
-    double L = 2 * 15.0;
-    double dx = 0.01;
+    double L = 2 * 10.0;
+    double dx = 0.001;
     int dim = (int)(L / dx);
 
     double x[dim];
@@ -33,10 +33,14 @@ int main(){
     psi[1] = cexp(I*k*x[1]);
 
     /* solve the equation */
+    execute_numerov_complex(x,dx,psi,dim,F,&par);
+    
+    /* saving the data */
+    double V[dim];
+    initialize_pot(x,V,dim);
     FILE *file;
     file = fopen("solution.csv","w");
-    solve_numerov(x,psi,dim,dx,F,&par,file);
+    save_data(x,V,psi,dim,file);
     fclose(file); 
-
 
 }

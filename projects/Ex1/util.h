@@ -11,7 +11,8 @@ typedef struct Param{
 /* functions headers */
 double potential(double x);
 double F(double x, void *p);
-void solve_numerov(double x[], complex double psi[], int dim, double dx, double F(double, void *p), void *p, FILE *outfile);
+void initialize_pot(double x[], double V[], int dim);
+void save_data(double x[], double V[], complex double psi[], int dim, FILE *outfile);
 
 
 #endif
