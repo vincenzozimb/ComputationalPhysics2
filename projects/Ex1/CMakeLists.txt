@@ -22,7 +22,10 @@ target_link_libraries(scatt m myfunc)
 
 # add custom commands
 add_custom_target(run-ex1-scatt
-    COMMAND scatt
+    COMMAND scatt && python plot.py
     DEPENDS scatt 
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot.py
+DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

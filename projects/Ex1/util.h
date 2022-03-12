@@ -9,8 +9,10 @@ typedef struct Param{
 
 
 /* functions headers */
-double F_gauss(double x, void *p);
+double V(double x);
+double F(double x, void *p);
 void solve_numerov(double x[], complex double psi[], int dim, double dx, double F (double, void *p), void *p, FILE *outfile);
+double normalize(complex double psi[], int dim, double dx);
 
 
 #endif
