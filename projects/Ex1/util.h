@@ -9,10 +9,9 @@ typedef struct Param{
 
 
 /* functions headers */
-double V(double x);
+double potential(double x);
 double F(double x, void *p);
-void solve_numerov(double x[], complex double psi[], int dim, double dx, double F (double, void *p), void *p, FILE *outfile);
-double normalize(complex double psi[], int dim, double dx);
+void solve_numerov(double x[], complex double psi[], int dim, double dx, double F(double, void *p), void *p, FILE *outfile);
 
 
 #endif
