@@ -4,4 +4,5 @@ add_library(myfunc
                     numerov.c
                     bisection.c
                     zeros_newton.c
+                    integrate_trap.c
 )
