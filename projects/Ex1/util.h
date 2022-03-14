@@ -9,10 +9,6 @@ typedef struct Param{
 
 
 /* functions headers */
-double potential(double x);
-double F(double x, void *p);
-void initialize_pot(double x[], double V[], int dim);
-void save_data(double x[], double V[], complex double psi[], int dim, FILE *outfile);
 
 
 #endif
