@@ -39,7 +39,19 @@ make run-test
 
 ---
 
-## Project 1: to write
+## Project 1: scattering $H-Kr$
+
+To run the code for the scattering, type:
+
+```C
+make run-ex1-scatt
+```
+
+Instead to run the code for the bound states, type:
+
+```C
+make run-ex1-bound
+```
 
 ---
 
