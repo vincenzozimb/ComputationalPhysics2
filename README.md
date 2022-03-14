@@ -39,7 +39,7 @@ make run-test
 
 ---
 
-## Project 1: scattering $H-Kr$
+## Project 1: scattering H-Kr
 
 To run the code for the scattering, type:
 
