@@ -4,38 +4,37 @@
 #include <math.h>
 
 #include "util.h"
-#include "print_routines.h"
 
 int main(){
 
     /* parameters */
 
-    int dim = 1000;
+    double L = 20.0;
+    double dx = 1e-3;
     
-    double x[dim], v[dim];
-    complex double psi[dim];
-    double L = 10.0;
-    double dx = L / (dim-1);
+    int dim = (int)(2.0*L/dx);
 
     ParamF par;
-    par.xi = 1.0;
     par.E = 0.8;
+    par.xi = 1.0;
 
     double k = sqrt(par.E / par.xi);
 
-    /* initial conditions */
-    x[0] = -L / 2.0;
-    x[1] = x[0] + dx;
-    psi[0] = cexp(I*k*x[0]);
-    psi[1] = cexp(I*k*x[1]);
+    double x[dim], v[dim];
+    complex double psi[dim];
 
-    /* solving the equation */
-    solve_numerov(x,v,psi,dim,dx,F,&par);
-    
-    /* saving the data */
+    /* initial conditions */
+    psi[0] = cexp(I*k*(-L));
+    psi[1] = cexp(I*k*(-L+dx));
+
+    /* solve the equation */
+    fill_potential(v,x,dim);
+    solve_numerov(x,psi,L,dx,F_step,&par);
+
+    /* save the data */
     FILE *file;
     file = fopen("solution.csv","w");
-    save_data(x,v,psi,dim,file); 
+    save_data(x,v,psi,dim,file);
     fclose(file);
 
 
