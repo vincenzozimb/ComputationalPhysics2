@@ -31,7 +31,7 @@ Then execute the instructions for the single projects, always remaining in the `
 
 ---
 
-## Project 0: test
+## Project 0: test. Currently: Simple solving 1D SE with numerov
 
 ```C
 make run-test
