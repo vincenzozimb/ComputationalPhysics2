@@ -2,13 +2,9 @@
 #define __UTIL_H__
 
 /* typedef */
-typedef struct Param{
-    double xi;
-    double E;
-}Param;
 
+/* functons */
 
-/* functions headers */
 
 
 #endif

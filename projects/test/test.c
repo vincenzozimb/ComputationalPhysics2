@@ -32,7 +32,7 @@ int main(){
 
     ParamF par;
     par.xi = 1.0;
-    par.E = 1.2;
+    par.E = 1.0;
 
     double k = sqrt(par.E / par.xi);
 

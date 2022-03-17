@@ -12,20 +12,20 @@ def read_csv(filename):
 # plot: 
 def plot_func(data):
     x = [float(i[0]) for i in data]
-    pot = [float(i[1]) for i in data]
-    real = [float(i[2]) for i in data]
-    imag = [float(i[3]) for i in data]
-    plt.plot(x,pot,label = 'potential')
-    plt.plot(x,real,label = 'real part')
-    plt.plot(x,imag,label = 'imag part')
+    sigma = [float(i[1]) for i in data]
+    # real = [float(i[2]) for i in data]
+    # imag = [float(i[3]) for i in data]
+    plt.plot(x,sigma,label = '$\sigma_{tot}$')
+    # plt.plot(x,real,label = 'real part')
+    # plt.plot(x,imag,label = 'imag part')
     plt.legend()
-    plt.xlabel('x')
+    plt.xlabel('E')
     plt.savefig('plot.png')
     plt.show()
 
 ################
 
-filename='solution.csv'
+filename='sigma_tot.csv'
 data = read_csv(filename)
 plot_func(data)
 
