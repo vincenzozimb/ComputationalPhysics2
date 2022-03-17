@@ -21,8 +21,6 @@ void solve_numerov(double x[], double v[], complex double psi[], double L, doubl
 /* ------------------------------------------- */
 int main(){
 
-    printf("Hello World!\n");
-
     /* parameter */
     double L = 10.0;
     double dx = 1e-3;
