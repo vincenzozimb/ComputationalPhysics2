@@ -5,4 +5,8 @@ add_library(myfunc
                     bisection.c
                     zeros_newton.c
                     integrate_trap.c
+                    bessel_func.c
 )
+
+target_compile_options(myfunc PRIVATE -Wall -O3)
+target_link_libraries(myfunc m)
