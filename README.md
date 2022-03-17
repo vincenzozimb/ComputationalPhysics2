@@ -12,7 +12,7 @@ Click this [link](https://didatticaonline.unitn.it/dol/course/view.php?id=34003)
 >
 > The folder `myfunc` consists in a library with some functions to be used in all the exercises.
 >
-> The folder `reports` contains the reports of the exercices.
+> The folder `reports` contains the reports of the exercises.
 
 ---
 
@@ -51,6 +51,12 @@ Instead to run the code for the bound states, type:
 
 ```C
 make run-ex1-bound
+```
+
+To test the routine for calculating the Bessel functions type:
+
+```C
+make run-ex1-bessel_test
 ```
 
 ---
