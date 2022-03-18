@@ -3,7 +3,7 @@ add_executable(scatt scatt.c util.c)
 
 target_compile_options(scatt PRIVATE -Wall -O3)
 
-target_link_libraries(scatt m myfunc)
+target_link_libraries(scatt m myfunc gsl)
 
 # add custom commands
 add_custom_target(run-ex1-scatt
@@ -17,18 +17,18 @@ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 
 ###########################################################
-add_executable(bound bound.c util.c)
+# add_executable(bound bound.c util.c)
 
-target_compile_options(bound PRIVATE -Wall -O3)
+# target_compile_options(bound PRIVATE -Wall -O3)
 
-target_link_libraries(bound m myfunc)
+# target_link_libraries(bound m myfunc)
 
-# add custom commands
-add_custom_target(run-ex1-bound
-    COMMAND bound
-    DEPENDS bound 
-    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
-)
+# # add custom commands
+# add_custom_target(run-ex1-bound
+#     COMMAND bound
+#     DEPENDS bound 
+#     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+# )
 
 
 ###########################################################

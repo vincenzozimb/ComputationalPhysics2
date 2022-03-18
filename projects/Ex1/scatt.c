@@ -1,7 +1,9 @@
-#include  <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "util.h"
+#include "print_routines.h"
 
 int main(){
 
@@ -14,9 +16,9 @@ int main(){
 
 
     /* conversion, do not edit */
-	double u = 931.49410242e9; // meV/c^2
+	double amu = 931.49410242e9; // meV/c^2
     double s_ev = (s / 1.97327) * 1e-6; // ħ*c/meV (length scale)
-    mu = mu * u; // meV/c^2 (mass scale)  
+    mu = mu * amu; // meV/c^2 (mass scale)  
 
 
     /* adimensional parameter xi */
@@ -34,6 +36,45 @@ int main(){
 	double L = 10.0;
 	double dr = 0.001;    
 
+    int dim = (int)(L / dr);
+    double u[dim];
+    double r[dim];
+
+    /* initial condition */
+    r[0] = 0.5;
+    r[1] = r[0] + dr;
+    u[0] = exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[0], -5));
+    u[1] = exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[1], -5));
+
+    int idx1 = dim-8;
+    int idx2 = dim-20;
+
+    FILE* f_sigma;
+    f_sigma = fopen("sigma_tot.csv","w");
+    
+    double k, sigma, delta;
+
+    double E = E_start;
+    while( E<E_end ) {
+        k = sqrt(E/xi);
+        
+        sigma = 0.0;
+        for(int l=0; l < l_max; l++){
+            Param p = {xi,E,l};
+            solve_numerov(r,u,dim,dr,F,&p);
+            delta = phase_shift(k,l,r[idx1],r[idx2],u[idx1],u[idx2]);
+            sigma += (2*l+1) * pow(sin(delta),2);
+        }
+        sigma *= 4*M_PI/(k*k);
+
+        fprint_double(f_sigma,E*eps);
+        fprint_double(f_sigma,sigma*s*s);
+        fprintf(f_sigma,"\n");
+
+        E += dE;
+    }
+
+    fclose(f_sigma);
 
 
 
