@@ -55,6 +55,12 @@ double calculate_n(double x, int order){
 
 }
 
+double recursive_bessel(double x, int l, double prec, double curr){
+    assert(x >= EPS);
+
+    return (2.0*l + 1) / x * curr - prec;
+}
+
 // double j_plus(double x){
 //     assert(x >= EPS);
 //     return sin(x) / (x * x) - cos(x) / x;
