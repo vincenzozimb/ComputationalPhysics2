@@ -26,13 +26,13 @@ int main(){
 
 
     /* energy in [E_start,E_end] meV */
-	double E_start = 0.5 / eps;
+	double E_start = 0.01 / eps;
 	double E_end = 5.0 / eps;
 	double dE = 0.01 / eps;
 
 
 	/* other parameters */
-	int l_max = 25;
+	int l_max = 10;
 	double L = 10.0;
 	double dr = 0.001;    
 
