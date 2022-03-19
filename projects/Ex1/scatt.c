@@ -26,7 +26,7 @@ int main(){
 
 
     /* energy in [E_start,E_end] meV */
-	double E_start = 0.01 / eps;
+	double E_start = 0.1 / eps;
 	double E_end = 5.0 / eps;
 	double dE = 0.01 / eps;
 
@@ -34,7 +34,7 @@ int main(){
 	/* other parameters */
 	int l_max = 10;
 	double L = 10.0;
-	double dr = 0.001;    
+	double dr = 0.01;    
 
     int dim = (int)(L / dr);
     double u[dim];
@@ -47,13 +47,13 @@ int main(){
     u[1] = exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[1], -5));
 
     int idx1 = dim-8;
-    int idx2 = dim-20;
+    int idx2 = dim-15;
 
     FILE* f_sigma;
     f_sigma = fopen("sigma_tot.csv","w");
     
     double k, sigma, delta;
-
+    
     double E = E_start;
     while( E<E_end ) {
         k = sqrt(E/xi);

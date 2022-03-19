@@ -16,7 +16,7 @@ def plot_func(data):
     plt.plot(x,sigma,label = '$\sigma_{tot}$')
     plt.legend()
     plt.xlabel('E[meV]')
-    plt.ylabel('$\sigma / \ell_0^2$')
+    plt.ylabel('$\sigma_{tot} / \ell_0^2$')
     plt.savefig('plot.png')
     plt.show()
 
