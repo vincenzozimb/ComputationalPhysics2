@@ -15,7 +15,8 @@ def plot_func(data):
     sigma = [float(i[1]) for i in data]
     plt.plot(x,sigma,label = '$\sigma_{tot}$')
     plt.legend()
-    plt.xlabel('E')
+    plt.xlabel('E[meV]')
+    plt.ylabel('$\sigma_{tot} / \ell_0$')
     plt.savefig('plot.png')
     plt.show()
 
