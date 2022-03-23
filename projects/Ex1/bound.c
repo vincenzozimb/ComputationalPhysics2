@@ -14,7 +14,7 @@ int main(){
 double L = 6.0;
 double h = 0.01;
 double dE = 0.01;
-double E = 2.0 * dE;
+double E = 10.0 * dE;
 int n = 5;
 int N = (int) L/h;
 printf("N : %d\n", N);
@@ -25,13 +25,13 @@ Param par;
 par.L = L;
 par.h = h;
 par.n = 0;
-par.x0 = sqrt(2.0 * (E - dE));
 
 double delta_prec = delta(E - dE, &par);
 double delta_curr, delta_succ;
 double E_bound;
 FILE *pd;
 pd = fopen("delta.csv", "w");
+
 do {
 
  delta_curr = delta(E , &par);
@@ -41,10 +41,14 @@ do {
 
 if (delta_prec * delta_curr < 0.0)
 {
-    assert(delta(E-dE, &par) * delta(E, &par) <0.0);
+    // printf("d*d : %lf\n",delta_prec * delta_curr );
+   //  assert(delta(E-dE, &par) * delta(E, &par) <0.0);
+   printf("diff: %lf \n",fabs(delta(E-dE, &par)- delta_prec) );
+    assert(fabs(delta(E-dE, &par)- delta_prec) < EPS);
+    
+
     if ((delta_prec <= delta_curr && delta_curr <= delta_succ) || (delta_prec >= delta_curr && delta_curr >= delta_succ) )
     {
-
         E_bound = bisection( delta, E - dE, E , &par );
         printf("E_%d : %lf\n", par.n, E_bound);
         par.n++;

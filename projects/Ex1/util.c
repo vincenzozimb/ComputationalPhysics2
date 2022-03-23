@@ -46,7 +46,7 @@ double delta(double E, void *p){
 Param *par = (Param *)p;
     double L = par->L;
     double h = par->h;
-    double x0 = par->x0;
+    double x0 = sqrt(2.0 * E);
     int n = par->n;
     assert(n >= 0); // necessary to debug
 
@@ -57,6 +57,7 @@ Param *par = (Param *)p;
     double phiL[dimL], phiR[dimR];
 
     par->E = E;
+    par->x0 = x0;
 
     /* ----- Initial conditions and evolution ----- */
     xL[0] = - L/2.0;     xL[1] = xL[0] + h;
