@@ -6,6 +6,7 @@
 #include "util.h"
 #include "numerov.h"
 #include "bessel_func.h"
+#include "print_routines.h"
 
 /* functions */
 double lj(double r){
@@ -79,6 +80,7 @@ Param *par = (Param *)p;
     {
         phiR[ii] *= R;
     }
+
     
     /* ----- Return value ----- */
 

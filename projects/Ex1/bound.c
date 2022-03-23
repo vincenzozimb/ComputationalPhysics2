@@ -11,10 +11,10 @@
 int main(){
 
 /* ------ Parameters ------ */
-double L = 6.0;
+double L = 16.0;
 double h = 0.01;
 double dE = 0.01;
-double E = 10.0 * dE;
+double E = 2.0 * dE;
 int n = 5;
 int N = (int) L/h;
 printf("N : %d\n", N);
@@ -34,18 +34,20 @@ pd = fopen("delta.csv", "w");
 
 do {
 
+ delta_prec = delta(E - dE, &par);
  delta_curr = delta(E , &par);
  fprint_double(pd, E);
  fprint_double_newline(pd, delta_curr);
  delta_succ = delta(E + dE, &par);
 
+// printf("delta_prec : %lf\t delta_curr : %lf\t delta_succ : %lf\n", delta_prec, delta_curr, delta_succ);
+// printf("Delta_prec : %lf\t Delta_curr : %lf\t Delta_succ : %lf\n", delta(E-dE, &par),delta(E, &par),delta(E+dE, &par) );
+// printf("\n\n");
 if (delta_prec * delta_curr < 0.0)
 {
-    // printf("d*d : %lf\n",delta_prec * delta_curr );
-   //  assert(delta(E-dE, &par) * delta(E, &par) <0.0);
-   printf("diff: %lf \n",fabs(delta(E-dE, &par)- delta_prec) );
-    assert(fabs(delta(E-dE, &par)- delta_prec) < EPS);
-    
+    assert(delta(E-dE, &par) * delta(E, &par) <0.0);
+    //printf("diff: %lf \n",fabs(delta(E-dE, &par)- delta_prec) );
+    // assert(fabs(delta(E-dE, &par)- delta_prec) < EPS);
 
     if ((delta_prec <= delta_curr && delta_curr <= delta_succ) || (delta_prec >= delta_curr && delta_curr >= delta_succ) )
     {

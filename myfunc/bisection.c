@@ -6,7 +6,7 @@ double bisection(double f(double,void*),double low, double high, void *p){
     
     assert(low < high);
 	assert(isfinite(low) && isfinite(high));
-	assert(f(low, p) * f(high, p) <= 0.0);
+    assert(f(low, p) * f(high, p) <= 0.0);
 
 	if ( fabs(f(low, p)) <= EPS ) {
 		return low;

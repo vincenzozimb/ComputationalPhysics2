@@ -24,12 +24,14 @@ target_compile_options(bound PRIVATE -Wall -O3)
 target_link_libraries(bound m myfunc gsl)
 
 # add custom commands
-add_custom_target(run-ex1-bound
-    COMMAND bound
+add_custom_target(run-ex1-bound 
+    COMMAND bound && python plot_delta.py
     DEPENDS bound 
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_delta.py
+DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################################
 add_executable(bessel_test bessel_test.c)
