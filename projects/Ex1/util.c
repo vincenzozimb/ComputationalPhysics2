@@ -163,7 +163,7 @@ double run_for_delta(double E, void *p){
     for(int i=0; i<dimR; i++){
         psiR[i] *= R;
     }
-
+    
     /* return delta */
     assert( fabs(psiL[dimL-1] - psiR[dimR-1]) < EPS );
     double ris = psiL[dimL-2] + psiR[dimR-2];
