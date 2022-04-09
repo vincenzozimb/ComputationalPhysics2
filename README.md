@@ -58,28 +58,3 @@ To test the routine for calculating the Bessel functions type:
 ```C
 make run-ex1-bessel_test
 ```
-
----
-
-<!-- ## Project 2
-
-Now I write something *in this way* or **in this way**
-
-> acchiussiddì
-
-If you want, you can also:
-
-* a
-* chiu
-* ssi
-* ddì
-
----
-
-## Project 3
-
-Prova $\LaTeX$
-
-> $ \frac{d}{dt}\frac{\partial \mathcal{L}}{\partial \dot{q}}-\frac{\partial \mathcal{L}}{\partial q}=0$
-
---- -->

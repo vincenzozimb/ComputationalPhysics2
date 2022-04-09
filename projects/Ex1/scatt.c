@@ -6,6 +6,7 @@
 #include "print_routines.h"
 #include "bessel_func.h"
 
+
 int main(){
 
 	/* system parameters */
@@ -24,16 +25,17 @@ int main(){
 
     /* adimensional parameter xi */
     double xi = 1.0 / (2.0 * mu * s_ev * s_ev * eps);
+    printf("\n\nxi = %lf\n\n",xi);
 
 
     /* energy in [E_start,E_end] meV */
 	double E_start = 0.1 / eps;
-	double E_end = 5.0 / eps;
+	double E_end = 3.5 / eps;
 	double dE = 0.01 / eps;
 
 
 	/* other parameters */
-	int l_max = 10;
+	int l_max = 6;
 	double L = 10.0;
 	double dr = 0.01;    
 
@@ -41,15 +43,16 @@ int main(){
     double u[dim];
     double r[dim];
 
-    Param par;
+    Param_F par;
     par.xi = xi;
 
 
     /* initial condition */
+    double A = 1e30;
     r[0] = 0.5;
     r[1] = r[0] + dr;
-    u[0] = exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[0], -5));
-    u[1] = exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[1], -5));
+    u[0] = A * exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[0], -5));
+    u[1] = A * exp(-sqrt(4.0 / (xi*25.0) ) * pow(r[1], -5));
 
 
     /* two points at the end */
@@ -58,7 +61,7 @@ int main(){
 
 
     /* initialize position */
-    initialize_r(r,dr,dim);
+    initialize_position(r,dr,dim);
 
     
     /* solving and saving */
@@ -77,11 +80,14 @@ int main(){
         FuncBessel f2 = {j_minus(k*r[idx2]), j_zero(k*r[idx2]), n_minus(k*r[idx2]), n_zero(k*r[idx2])};
 
         sigma = 0.0;
-        for(int l=0; l<l_max; l++){
+        for(int l=0; l<=l_max; l++){
 
         par.l = l;
-        solve_numerov(r,u,dim,dr,F,&par);
+        solve_numerov(r,u,dim,dr,F_lj,&par);
         delta = phase_shift(r[idx1],r[idx2],u[idx1],u[idx2],k,l,&f1,&f2);
+        if(fabs(E - 0.3)<= dE/2.0 && PRINT){
+            printf("delta_%d = %lf\n",l,delta);
+        }
         sigma += (2*l+1) * pow(sin(delta),2);
         
         }
@@ -95,14 +101,5 @@ int main(){
     }
 
     fclose(f_sigma);
-
-
-
-
-
-    
-  
-
-
 
 }
