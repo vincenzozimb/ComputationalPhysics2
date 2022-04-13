@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
-import scipy as sp
+import scipy.linalg
 
 from basis import *
         
@@ -11,6 +11,7 @@ class SYSTEM(STO4G):
         self.name=name
         self.N=N
         self.Z=Z
+        self.imax = 1000
         self.orbitals = orbitals
         self.basis = STO4G(self)
         self.h= self.kinetic() + self.ext_pot()
@@ -63,19 +64,28 @@ class SYSTEM(STO4G):
                         E[p,r,s,q] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[q])*(alpha[r]+alpha[s])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
         return D + E 
 
-    def fill_density_matrix(self, C): ####### CHECK THIS
+    def fill_density_matrix(self, C): 
         """
         Compute the density matrix.
+
+        Returns the density matrix evaluated using the coefficient matrix C, according to
+        
+        :math:`M_{\alpha\beta} = \sum_i^{occ} C_{\alpha,i}^* C_{\beta,i}`
+        i runs over the occupied orbitals 
+        alpha and beta over the STO4G coefficients
+
         INPUT:
             SYS: system
             C: AO coefficients
         OUTPUT:
             D: Density matrix
         """
-        density = np.outer(np.conjugte(C), C)
+        density = np.zeros( (4,4) , dtype=np.complex128)
+        for i in range(round(self.N/2+0.1)):
+            density += np.outer( np.conjugate(C[:,i]), C[:,i])
         return density
 
-    def fill_fock_matrix(self, C): ####### CHECK THIS
+    def fill_fock_matrix(self, C): 
         """
         Compute the Fock matrix.
         INPUT:
@@ -84,17 +94,54 @@ class SYSTEM(STO4G):
         OUTPUT:
             F: Fock matrix
         """
-        F = self.h
-        F += 0.5*np.einsum('pqrs,rs->pq', self.DE, C) 
-        F = np.einsum('pqrs,rs->pq', self.h, C) + np.einsum('pqrs,pr->qs', self.h, C)
-        return F
+        f = np.zeros(self.h.shape, dtype=np.complex128)    
+        density = self.fill_density_matrix(C)
+        f += np.einsum('ij,aibj->ab', density, self.DE, dtype=np.complex128)
+        f += self.h
+        return f
 
 
     def solve_hf(self): ##### CHECK THIS
-        for i in range (0,round(self.N/2)):
-            epsilon, C = sp.linalg.eigh(np.identity(len(self.basis.STO4G_alpha)))
+        r"""
+        Solve the Hartree-Fock equation, with initial guess on the coefficients.
+
+        INPUT:
+            SYS: system
+        OUTPUT:
+            C: AO coefficients
+            Energy: Hartree-Fock energy
+        """
+        r = round(self.N/2+0.1)  
+        C =np.zeros((4, r))
+        epsilon = np.zeros((r))
+        for i in range(0,r):
+                C[0,i] = 1
+                epsilon[i] = 1
+        # density = self.fill_density_matrix(C)
+        # F = self.fill_fock_matrix(C)
+        # print(F)
+        #epsilon, C = scipy.linalg.eigh(np.identity(r))
+        epsilon_old = np.zeros(epsilon.shape)
+
+        #density = self.fill_density_matrix(C)
+        l=10e-4
+        i=0
+        while np.linalg.norm(epsilon-epsilon_old) > l and i<self.imax:
+            epsilon_old = epsilon
+            F = self.fill_fock_matrix(C)
+            epsilon, C = scipy.linalg.eig(F, self.basis.overlap(),check_finite=True)
+            i +=1
+        ## Print coefficients and energies
+        print("Coefficients:")
+        print(C,"\n")
+        print("Energies:")
+        print(epsilon)
+
+
+
 
 
 
 
 sys = SYSTEM("H",1,1,["1s"])
+sys.solve_hf()
