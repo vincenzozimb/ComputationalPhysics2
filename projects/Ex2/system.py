@@ -3,17 +3,35 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
 import scipy.linalg
-
+import argparse
+import sys
 from basis import *
         
+#instruction how to run the program 
+##################################
+#SELECTOR FROM COMMAND LINE
+##################################
+ap = argparse.ArgumentParser(description="The program performs the calculation of the ground state energy and the ground state wave function for a given atom.")
+ap.add_argument("-a", "--Atom choice", choices=["H", "He", "Be"], type=str, required=True, help=" H--> Hartree fock for close shell Hydrogen atom; \n \
+#     He--> Hartree fock for Helium atom; \
+#     Be--> Hartree fock for Berillium atom.")
+args = vars(ap.parse_args())
+#print(sys.argv)
+selector = args["Atom choice"]
+#selector =str(sys.argv[1])
+print(selector)
+
+#########################################
+#definition of functions
+#########################################
 class SYSTEM(STO4G): 
-    def __init__(self, name, N, Z, orbitals):
+    def __init__(self, name):
         self.name=name
-        self.N=N
-        self.Z=Z
-        self.imax = 1000
-        self.orbitals = orbitals
-        self.basis = STO4G(self)
+        self.imax = 10000
+        self.basis = STO4G(name)
+        self.orbitals = self.basis.orbitals
+        self.N = self.basis.N
+        self.Z = self.basis.Z
         self.h= self.kinetic() + self.ext_pot()
         self.DE = self.de()
     
@@ -54,15 +72,15 @@ class SYSTEM(STO4G):
         """
         alpha = self.basis.STO4G_alpha
         D = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
-        E = D 
+        E = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
         ## initialize the diagonal terms
         for p in range(0,len(alpha)):
             for q in range(0,len(alpha)):
                 for r in range(0,len(alpha)):
                     for s in range(0,len(alpha)):
                         D[p,r,q,s] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[q])*(alpha[r]+alpha[s])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
-                        E[p,r,s,q] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[q])*(alpha[r]+alpha[s])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
-        return D + E 
+                        E[p,r,s,q] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[s])*(alpha[r]+alpha[q])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
+        return D - E 
 
     def fill_density_matrix(self, C): 
         """
@@ -111,6 +129,7 @@ class SYSTEM(STO4G):
             C: AO coefficients
             Energy: Hartree-Fock energy
         """
+        # Initial guess
         r = round(self.N/2+0.1)  
         C =np.zeros((4, r))
         epsilon = np.zeros((r))
@@ -124,7 +143,7 @@ class SYSTEM(STO4G):
         epsilon_old = np.zeros(epsilon.shape)
 
         #density = self.fill_density_matrix(C)
-        l=10e-4
+        l=10e-6
         i=0
         while np.linalg.norm(epsilon-epsilon_old) > l and i<self.imax:
             epsilon_old = epsilon
@@ -132,6 +151,9 @@ class SYSTEM(STO4G):
             epsilon, C = scipy.linalg.eig(F, self.basis.overlap(),check_finite=True)
             i +=1
         ## Print coefficients and energies
+        print("i=",i)
+        print("Overlap:")
+        print(self.basis.overlap())
         print("Coefficients:")
         print(C,"\n")
         print("Energies:")
@@ -139,9 +161,9 @@ class SYSTEM(STO4G):
 
 
 
-
-
-
-
-sys = SYSTEM("H",1,1,["1s"])
+#################################################################
+#MAIN
+#################################################################
+#print(selector)
+sys = SYSTEM(selector)
 sys.solve_hf()
