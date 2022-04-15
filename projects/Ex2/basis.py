@@ -15,7 +15,7 @@ class STO4G:
             self.N = 1
             self.Z = 1
         if self.name == "He":
-            self.alpha = np.array([0.5,0.5,0.5,0.5])
+            self.alpha = np.array([14.899983,2.726485,0.757447,0.251390])
             self.orbitals = ["1s"]
             self.N=2
             self.Z=2

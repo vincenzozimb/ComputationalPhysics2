@@ -22,7 +22,7 @@ selector = args["Atom choice"]
 print(selector)
 
 #########################################
-#definition of functions
+#definition of functions and classes
 #########################################
 class SYSTEM(STO4G): 
     def __init__(self, name):
@@ -43,10 +43,11 @@ class SYSTEM(STO4G):
         OUTPUT:
             T: Kinetic energy matrix
         """
+        print("Basis set:",self.basis.STO4G_alpha)
         T = np.zeros((len(self.basis.STO4G_alpha),len(self.basis.STO4G_alpha)))
         for p in range(len(self.basis.STO4G_alpha)):
             for q in range(len(self.basis.STO4G_alpha)):
-                T[p,q] = 3*(self.basis.STO4G_alpha[p]*self.basis.STO4G_alpha[q]*(np.pi**1.5))/(self.basis.STO4G_alpha[p]+self.basis.STO4G_alpha[q])**(2.5)
+                T[p,q] = 3*(self.basis.STO4G_alpha[p]*self.basis.STO4G_alpha[q]*(np.pi**1.5))/((self.basis.STO4G_alpha[p]+self.basis.STO4G_alpha[q])**(2.5))
         return T
 
     def ext_pot(self):
@@ -61,6 +62,8 @@ class SYSTEM(STO4G):
         for p in range(len(self.basis.STO4G_alpha)):
             for q in range(len(self.basis.STO4G_alpha)):
                 V[p,q] = (2*np.pi/(self.basis.STO4G_alpha[p]+self.basis.STO4G_alpha[q]))
+        V = -(self.Z)*V
+        print("V",V)
         return V
     def de(self):
         """
@@ -73,17 +76,20 @@ class SYSTEM(STO4G):
         alpha = self.basis.STO4G_alpha
         D = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
         E = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
-        ## initialize the diagonal terms
+        ## initialize the direct and exchange terms
         for p in range(0,len(alpha)):
             for q in range(0,len(alpha)):
                 for r in range(0,len(alpha)):
                     for s in range(0,len(alpha)):
                         D[p,r,q,s] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[q])*(alpha[r]+alpha[s])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
-                        E[p,r,s,q] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[s])*(alpha[r]+alpha[q])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
-        return D - E 
+                        E[p,r,q,s] = (2*(np.pi)**(2.5))/((alpha[p]+alpha[s])*(alpha[r]+alpha[q])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
+        #D = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
+        #E = np.zeros((len(alpha),len(alpha),len(alpha),len(alpha)))
+        print(D-E)
+        return  D-E
 
     def fill_density_matrix(self, C): 
-        """
+        r"""
         Compute the density matrix.
 
         Returns the density matrix evaluated using the coefficient matrix C, according to
@@ -114,7 +120,7 @@ class SYSTEM(STO4G):
         """
         f = np.zeros(self.h.shape, dtype=np.complex128)    
         density = self.fill_density_matrix(C)
-        f += np.einsum('ij,aibj->ab', density, self.DE, dtype=np.complex128)
+        f += np.einsum('ij,abij->ab', density, self.DE, dtype=np.complex128)
         f += self.h
         return f
 
@@ -131,15 +137,14 @@ class SYSTEM(STO4G):
         """
         # Initial guess
         r = round(self.N/2+0.1)  
-        C =np.zeros((4, r))
-        epsilon = np.zeros((r))
+        C =np.ones((4, r))
+        epsilon = np.ones((4))
         for i in range(0,r):
                 C[0,i] = 1
-                epsilon[i] = 1
         # density = self.fill_density_matrix(C)
         # F = self.fill_fock_matrix(C)
         # print(F)
-        #epsilon, C = scipy.linalg.eigh(np.identity(r))
+        #epsilon, C = scipy.linalg.eigh(np.identity(4))
         epsilon_old = np.zeros(epsilon.shape)
 
         #density = self.fill_density_matrix(C)
@@ -148,16 +153,18 @@ class SYSTEM(STO4G):
         while np.linalg.norm(epsilon-epsilon_old) > l and i<self.imax:
             epsilon_old = epsilon
             F = self.fill_fock_matrix(C)
+            #print("energy",epsilon)
             epsilon, C = scipy.linalg.eig(F, self.basis.overlap(),check_finite=True)
             i +=1
         ## Print coefficients and energies
-        print("i=",i)
-        print("Overlap:")
-        print(self.basis.overlap())
-        print("Coefficients:")
-        print(C,"\n")
-        print("Energies:")
-        print(epsilon)
+        #print("Overlap:")
+        #print(self.basis.overlap())
+        ## Print coefficients and energies
+        #print("C=",C)
+        print("epsilon=",epsilon)
+        # Ground state energy: 
+        #energy_groundstate=2*np.einsum('ij,ij->', F, self.fill_density_matrix(C)) #+ np.einsum('pqrs,pqrs->', self.DE, np.outer(self.fill_density_matrix(C),self.fill_density_matrix(C)))
+        #print("energy_groundstate=",energy_groundstate)
 
 
 
