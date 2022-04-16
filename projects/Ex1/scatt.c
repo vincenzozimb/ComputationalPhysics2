@@ -102,4 +102,8 @@ int main(){
 
     fclose(f_sigma);
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/Sasha
