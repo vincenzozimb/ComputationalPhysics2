@@ -20,7 +20,7 @@ class STO4G:
             self.N=2
             self.Z=2
         if self.name == "Be":
-            self.alpha =np.array([0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5])
+            self.alpha =np.array([70.64859542,12.92782254,3.591490662,1.191983464,3.072833610,0.6652025433,0.2162825386,0.08306680972])
             self.orbitals = ["1s","2s"]
             self.N = 4
             self.Z = 4
@@ -44,6 +44,14 @@ class STO4G:
             for j in range(len(self.STO4G_alpha)):
                 S[i,j] = (np.pi/(self.STO4G_alpha[i]+self.STO4G_alpha[j]))**1.5
         return S
+    
+    def gaussian(self, x, alpha):
+        """
+        Compute vector of gaussian function"""
+        self.gg = []
+        for a in alpha:
+            self.gg.append(np.exp(-a*x**2))
+        return np.array(self.gg)
 
     def info(self):
         """
