@@ -4,7 +4,6 @@ import matplotlib.animation as animation
 import time
 import scipy.linalg
 import argparse
-import sys
 from basis import *
 
 #### Define parameters 
@@ -60,7 +59,7 @@ class SYSTEM(STO4G):
         self.Z = self.basis.Z
         self.h= self.kinetic() + self.ext_pot()
         self.DE = self.de()
-        self.threshold=10e-6
+        self.threshold=10e-8
     
     def kinetic(self):
         """
@@ -119,7 +118,7 @@ class SYSTEM(STO4G):
                                 E[p,q,r,s] = 1/((alpha[p]+alpha[s])*(alpha[r]+alpha[q])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
             D = (2*(np.pi)**(2.5))*D
             E = (2*(np.pi)**(2.5))*E
-        return 2*D-E
+        return (2*D-E)
 
     def fill_density_matrix(self,C): 
         r"""
@@ -151,8 +150,9 @@ class SYSTEM(STO4G):
         OUTPUT:
             F: Fock matrix
         """
-        f = np.zeros(self.h.shape, dtype=np.complex128)    
+        f = np.zeros(self.h.shape, dtype=np.complex128)   
         density = self.fill_density_matrix(C)
+        print("Density matrix:",density,"Coefficients:",C)
         f += self.h
         f += np.einsum('qs,pqrs->pr', density, self.DE, dtype=np.complex128)
         return f
@@ -183,8 +183,8 @@ class SYSTEM(STO4G):
             Energy: Hartree-Fock energy
         """
         if(self.name=="H"):
-            #energy_groundstate=self.epsilon_min
-            energy_groundstate = np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h)
+            energy_groundstate=self.epsilon_min
+            #energy_groundstate = np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h)
             print('Energy of the ground state (matrix element):',energy_groundstate, "compared with energy eignvalue:" , self.epsilon_min)
         else:
             energy_groundstate = 2*np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h) ## Lowest eigenvalue of the Fock matrix
@@ -201,7 +201,7 @@ class SYSTEM(STO4G):
             column index = run over the orbitals
             row index = run over the coefficients on each gaussian basis function (STO4G) 
         As initial guess we state that the orbital wave function is equal to the first gaussian in the basis expansion,
-         i.e. :math:'phi_i =C_{1i}exp(alpha_1 r^2)' and C_{1i}=1 for the first gaussian.
+         i.e. :math:'\phi_i =C_{1i}exp(alpha_1 r^2)' and C_{1i}=1 for the first gaussian.
 
         INPUT:
             SYS: system
@@ -215,16 +215,24 @@ class SYSTEM(STO4G):
         epsilon = np.ones((len(self.basis.STO4G_alpha)))
         for i in range(0,r):
                 C[0,i] = 1
-        #epsilon, self.C = scipy.linalg.eigh(np.identity(len(self.basis.STO4G_alpha)))
+        #epsilon, C = scipy.linalg.eigh(np.identity(len(self.basis.STO4G_alpha)))
         epsilon_old = np.zeros(epsilon.shape)
         i=0
+        self.C = C
         F = self.fill_fock_matrix(C)
-        while np.linalg.norm(epsilon-epsilon_old) > self.threshold and i<self.imax:
+        print("C=",self.C,"size=",self.C.shape)
+        while np.linalg.norm(min(epsilon)-min(epsilon_old)) > self.threshold and i < self.imax:
             epsilon_old = epsilon
-            F_old=F
+            C_old=self.C
             epsilon, C = scipy.linalg.eig(F, self.basis.overlap(),check_finite=True)
-            F = self.fill_fock_matrix(C)
-            F = F*beta + (1-beta)*F_old
+            self.epsilon_min=min(epsilon)
+            self.epsilon_index=np.where(epsilon==self.epsilon_min)[0]
+            self.C=C[:,self.epsilon_index]
+            #normalize the wf
+            self.C=self.C/np.sqrt(np.einsum('ij,jk->ik',np.transpose(self.C), np.einsum('ij,jk->ik',self.basis.overlap(),self.C)))
+            self.C = self.C*beta + (1-beta)*C_old
+            F = self.fill_fock_matrix(self.C)
+            #print(min(epsilon),"and",min(epsilon_old))
             i +=1
         print("epsilon=",epsilon)
         #We choose the minimun eigenvalue in order to calculate the ground state energy: 
@@ -256,6 +264,6 @@ class SYSTEM(STO4G):
 #################################################################
 #MAIN
 #################################################################
-sys = SYSTEM(selector)
-sys.solve_hf()
-sys.plot_wf()
+syst = SYSTEM(selector)
+syst.solve_hf()
+syst.plot_wf()
