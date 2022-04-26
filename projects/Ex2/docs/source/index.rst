@@ -1,17 +1,19 @@
-.. Hartree-Fock documentation master file, created by
-   sphinx-quickstart on Fri Apr 22 20:06:57 2022.
+.. abdul documentation master file, created by
+   sphinx-quickstart on Mon Apr 25 17:23:45 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Hartree-Fock's documentation!
-========================================
+Welcome to abdul's documentation!
+=================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-   modules
-
+   
+.. automodule:: system
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Indices and tables
 ==================
