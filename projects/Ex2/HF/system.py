@@ -4,53 +4,36 @@ import matplotlib.animation as animation
 import time
 import scipy.linalg
 import argparse
-import sys
 from basis import *
 
 #### Define parameters 
 beta=10e-3
 
-####################################
-#instruction how to run the program 
-##################################
-#SELECTOR FROM COMMAND LINE
-##################################
-ap = argparse.ArgumentParser(description="The program performs the calculation of the ground state energy and the ground state wave function for a given atom.")
-ap.add_argument("-a", "--Atom choice", choices=["H", "He", "Be"], type=str, required=True, help=" H--> Hartree fock for close shell Hydrogen atom; \n \
-#     He--> Hartree fock for Helium atom; \
-#     Be--> Hartree fock for Berillium atom.")
-args = vars(ap.parse_args())
-#print(sys.argv)
-selector = args["Atom choice"]
-#selector =str(sys.argv[1])
-print(selector)
 
+"""
+Hartree-Fock for closed shell atoms 
+----------------------------------------------------
+"""
 #########################################
 #definition of functions and classes
 #########################################
 class SYSTEM(STO4G): 
+    """_summary_
+
+    Args:
+        STO4G (basis set): gaussian basis set
+    """
     def __init__(self, name):
-        """
-        Initialize the system.
-        INPUT:
-            name: Name of the atom (only Hydrogen, Helium and Berillium are considered)
-        Then the system is initialized and as attibutes we have: 
-        self.name = name of the atom
-        self.imax = maximum number of iterations
-        self.basis = basis set (STO4G in this case)
-        self.orbitals = list of orbitals of the system (array of strings)
-        self.N = number of electrons
-        self.Z = atomic number
-        self.h = self.kinetic() + self.ext_pot() (1 body Hamiltonian in STO4G basis)
-        self.DE = self.de() (2 body Hamiltonian, Direct and exange terms in STO4G basis)
-        self.threshold = threshold for the norm of the residual 
+        """Constructor for the system class.
 
-        Then in the code after the HF procedure we will define new instances of the system class: 
-        self.C = AO coefficients
-        self.epsilon_min = energy of the minimum eigenvalue
-        self.epsilon_index = index of the minimum eigenvalue in the array of eigenvalues 
-
-
+        Args:
+            name (str): name of the atom
+        Instance variables:
+            :h (matrix): one-electron integrals
+            :DE (matrix): direct and exchange term
+            _basis (basis set): basis set
+            _Z (float): atomic number
+            -name (str): name of the atom
         """
         self.name=name
         self.imax = 10000
@@ -60,7 +43,7 @@ class SYSTEM(STO4G):
         self.Z = self.basis.Z
         self.h= self.kinetic() + self.ext_pot()
         self.DE = self.de()
-        self.threshold=10e-6
+        self.threshold=10e-8
     
     def kinetic(self):
         """
@@ -79,12 +62,10 @@ class SYSTEM(STO4G):
         return T
 
     def ext_pot(self):
-        """
-        Compute external potential matrix.
-        INPUT:
-            SYS: system
-        OUTPUT:
-            V: External potential matrix
+        """This funxctiommhlnl
+
+        Returns:
+            _type_: _description_
         """
         V = np.zeros((len(self.basis.STO4G_alpha),len(self.basis.STO4G_alpha)))
         for p in range(len(self.basis.STO4G_alpha)):
@@ -119,7 +100,7 @@ class SYSTEM(STO4G):
                                 E[p,q,r,s] = 1/((alpha[p]+alpha[s])*(alpha[r]+alpha[q])*(np.sqrt(alpha[p]+alpha[q]+alpha[r]+alpha[s])))
             D = (2*(np.pi)**(2.5))*D
             E = (2*(np.pi)**(2.5))*E
-        return 2*D-E
+        return (2*D-E)
 
     def fill_density_matrix(self,C): 
         r"""
@@ -143,15 +124,15 @@ class SYSTEM(STO4G):
         return density
 
     def fill_fock_matrix(self,C): 
+        """Compute the Fock matrix.
+
+        Args:
+            C (array): AO coefficients
+
+        Returns:
+            matrix: Fock matrix
         """
-        Compute the Fock matrix.
-        INPUT:
-            SYS: system
-            C: AO coefficients
-        OUTPUT:
-            F: Fock matrix
-        """
-        f = np.zeros(self.h.shape, dtype=np.complex128)    
+        f = np.zeros(self.h.shape, dtype=np.complex128)   
         density = self.fill_density_matrix(C)
         f += self.h
         f += np.einsum('qs,pqrs->pr', density, self.DE, dtype=np.complex128)
@@ -170,7 +151,7 @@ class SYSTEM(STO4G):
 
         return 0
     def evaluate_ground_state_energy(self):
-        r"""
+        """
         Evaluate the ground state energy.
 
         INPUT(self):
@@ -183,8 +164,8 @@ class SYSTEM(STO4G):
             Energy: Hartree-Fock energy
         """
         if(self.name=="H"):
-            #energy_groundstate=self.epsilon_min
-            energy_groundstate = np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h)
+            energy_groundstate=self.epsilon_min
+            #energy_groundstate = np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h)
             print('Energy of the ground state (matrix element):',energy_groundstate, "compared with energy eignvalue:" , self.epsilon_min)
         else:
             energy_groundstate = 2*np.einsum('pr,pr', self.fill_density_matrix(self.C), self.h) ## Lowest eigenvalue of the Fock matrix
@@ -193,7 +174,7 @@ class SYSTEM(STO4G):
         print("energy_groundstate=",energy_groundstate)
 
 
-    def solve_hf(self): ##### CHECK THIS
+    def solve_hf(self):
         r"""
         Solve the Hartree-Fock equation, with initial guess on the coefficients.
         
@@ -201,7 +182,7 @@ class SYSTEM(STO4G):
             column index = run over the orbitals
             row index = run over the coefficients on each gaussian basis function (STO4G) 
         As initial guess we state that the orbital wave function is equal to the first gaussian in the basis expansion,
-         i.e. :math:'phi_i =C_{1i}exp(alpha_1 r^2)' and C_{1i}=1 for the first gaussian.
+         i.e. :math:'\phi_i =C_{1i}exp(alpha_1 r^2)' and C_{1i}=1 for the first gaussian.
 
         INPUT:
             SYS: system
@@ -209,32 +190,43 @@ class SYSTEM(STO4G):
             self.C: AO coefficients
             self.energy_min: minimum energy eigenvalue after the Hartree-Fock procedure
         """
-        
+        #First guess on the coefficients
         r = round(self.N/2+0.1)  
         C =np.zeros((len(self.basis.STO4G_alpha), r))
         epsilon = np.ones((len(self.basis.STO4G_alpha)))
         for i in range(0,r):
                 C[0,i] = 1
-        #epsilon, self.C = scipy.linalg.eigh(np.identity(len(self.basis.STO4G_alpha)))
         epsilon_old = np.zeros(epsilon.shape)
         i=0
+        self.C = C
         F = self.fill_fock_matrix(C)
-        while np.linalg.norm(epsilon-epsilon_old) > self.threshold and i<self.imax:
+        #print("C=",self.C,"size=",self.C.shape)
+        while np.linalg.norm(min(epsilon)-min(epsilon_old)) > self.threshold and i < self.imax:
+            #Store the old eigenvalues and coefficients
             epsilon_old = epsilon
-            F_old=F
+            C_old=self.C
+            #Compute the new eigenvalues and coefficients
             epsilon, C = scipy.linalg.eig(F, self.basis.overlap(),check_finite=True)
-            F = self.fill_fock_matrix(C)
-            F = F*beta + (1-beta)*F_old
+            #Select only the lowest eigenvalue and get the index of the lowest eigenvector
+            self.epsilon_min=min(epsilon)
+            self.epsilon_index=np.where(epsilon==self.epsilon_min)[0]
+            #Store the new coefficients in the coefficient instance of the class
+            self.C=C[:,self.epsilon_index]
+            #normalize the wf coefficients
+            self.C=self.C/np.sqrt(np.einsum('ij,jk->ik',np.transpose(self.C), np.einsum('ij,jk->ik',self.basis.overlap(),self.C)))
+            #Vary slowly the coefficients (! then they are not normalized anymore)
+            self.C = self.C*beta + (1-beta)*C_old
+            #self.C=self.C/np.sqrt(np.einsum('ij,jk->ik',np.transpose(self.C), np.einsum('ij,jk->ik',self.basis.overlap(),self.C)))
+            #Compute the new Fock matrix
+            F = self.fill_fock_matrix(self.C)
             i +=1
-        print("epsilon=",epsilon)
-        #We choose the minimun eigenvalue in order to calculate the ground state energy: 
+        #get the minimun eigenvalue in order to calculate the ground state energy: 
         self.epsilon_min=min(epsilon)
         self.epsilon_index=np.where(epsilon==self.epsilon_min)[0]
         self.C=C[:,self.epsilon_index]
-        print("C=",self.C,"size=",self.C.shape)
         #normalize the wf
         self.C=self.C/np.sqrt(np.einsum('ij,jk->ik',np.transpose(self.C), np.einsum('ij,jk->ik',self.basis.overlap(),self.C)))
-        #print("C=",np.einsum('ij,jk->ik',np.conjugate(self.C), np.einsum('ij,jk->ik',self.basis.overlap(),self.C).shape))
+        #Compute the ground state energy
         self.evaluate_ground_state_energy()
 
 
@@ -247,8 +239,10 @@ class SYSTEM(STO4G):
         r = np.linspace(0.001,6,1000)
         s = self.basis.gaussian(r, self.basis.STO4G_alpha)
         wf = -np.einsum('ij,ik->jk', self.C, s)
-        #plt.plot(r,wf)
         plt.plot(r,wf[0,:])
+        plt.legend(["Radial wavefunction of "+self.name])
+        plt.xlabel(r'$r/a_0$')
+        plt.ylabel(r'$R(r)/a_0^{3}$')
         plt.show()
 
 
@@ -256,6 +250,20 @@ class SYSTEM(STO4G):
 #################################################################
 #MAIN
 #################################################################
-sys = SYSTEM(selector)
-sys.solve_hf()
-sys.plot_wf()
+####################################
+#instruction how to run the program 
+##################################
+#SELECTOR FROM COMMAND LINE
+##################################
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="The program performs the calculation of the ground state energy and the ground state wave function for a given atom.")
+    ap.add_argument("-a", "--Atom choice", choices=["H", "He", "Be"], type=str, required=True, help=" H--> Hartree fock for close shell Hydrogen atom; \n \
+        He--> Hartree fock for Helium atom; \
+        Be--> Hartree fock for Berillium atom.")
+    args = vars(ap.parse_args())
+    selector = args["Atom choice"]
+    syst = SYSTEM(selector)
+    syst.solve_hf()
+    syst.plot_wf()
+    #selector =str(sys.argv[1])
+####################################
