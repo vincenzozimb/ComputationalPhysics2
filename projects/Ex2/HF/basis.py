@@ -24,12 +24,6 @@ class STO4G:
             self.orbitals = ["1s","2s"]
             self.N = 4
             self.Z = 4
-        self.STO4G_alpha= []
-        for o in self.orbitals:
-            if o == "1s":
-                self.STO4G_alpha = np.concatenate((self.STO4G_alpha, self.alpha[0:self.K]))
-            if o == "2s":
-                self.STO4G_alpha = np.concatenate((self.STO4G_alpha, self.alpha[self.K:2*self.K]))
     
     def overlap(self):
         """
@@ -39,19 +33,28 @@ class STO4G:
         OUTPUT:
             S: Overlap matrix
         """
-        S = np.zeros((len(self.STO4G_alpha),len(self.STO4G_alpha)))
-        for i in range(len(self.STO4G_alpha)):
-            for j in range(len(self.STO4G_alpha)):
-                S[i,j] = (np.pi/(self.STO4G_alpha[i]+self.STO4G_alpha[j]))**1.5
+        S = np.zeros((self.K,self.K,len(self.orbitals)))
+        for l in range(len(self.orbitals)):
+            for i in range(self.K):
+                for j in range(self.K):
+                    S[i,j,l] = (np.pi/(self.alpha[i,l]+self.alpha[j,l]))**1.5
         return S
     
-    def gaussian(self, x, alpha):
-        """
-        Compute vector of gaussian function"""
-        self.gg = []
-        for a in alpha:
-            self.gg.append(np.exp(-a*x**2))
-        return np.array(self.gg)
+    def overlap1(self):
+        r = len(self.alpha)
+        S=np.zeros((r,r))
+        for i in range(r):
+            for j in range(r):
+                S[i,j] = (np.pi/(self.alpha[i]+self.alpha[j]))**1.5
+        return S
+    
+    # def gaussian(self, x, alpha):
+    #     """
+    #     Compute vector of gaussian function"""
+    #     self.gg = []
+    #     for a in alpha:
+    #         self.gg.append(np.exp(-a*x**2))
+    #     return np.array(self.gg)
 
     def info(self):
         """
