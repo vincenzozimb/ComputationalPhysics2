@@ -19,26 +19,11 @@ class STO4G:
             self.orbitals = ["1s"]
             self.N=2
             self.Z=2
-        if self.name == "Be":
+        if self.name == "Be" :
             self.alpha =np.array([70.64859542,12.92782254,3.591490662,1.191983464,3.072833610,0.6652025433,0.2162825386,0.08306680972])
             self.orbitals = ["1s","2s"]
             self.N = 4
             self.Z = 4
-    
-    def overlap(self):
-        """
-        Compute overlap matrix S.
-        INPUT:
-            BASIS: basis set
-        OUTPUT:
-            S: Overlap matrix
-        """
-        S = np.zeros((self.K,self.K,len(self.orbitals)))
-        for l in range(len(self.orbitals)):
-            for i in range(self.K):
-                for j in range(self.K):
-                    S[i,j,l] = (np.pi/(self.alpha[i,l]+self.alpha[j,l]))**1.5
-        return S
     
     def overlap1(self):
         r = len(self.alpha)
@@ -47,14 +32,15 @@ class STO4G:
             for j in range(r):
                 S[i,j] = (np.pi/(self.alpha[i]+self.alpha[j]))**1.5
         return S
+
     
-    # def gaussian(self, x, alpha):
-    #     """
-    #     Compute vector of gaussian function"""
-    #     self.gg = []
-    #     for a in alpha:
-    #         self.gg.append(np.exp(-a*x**2))
-    #     return np.array(self.gg)
+    def gaussian(self, x, alpha):
+        """
+        Compute vector of gaussian function"""
+        self.gg = []
+        for a in alpha:
+            self.gg.append(np.exp(-a*x**2))
+        return np.array(self.gg)
 
     def info(self):
         """
