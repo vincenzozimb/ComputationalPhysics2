@@ -54,3 +54,4 @@ dkms.conf
 # various
 build/
 .vscode/
+__pycache__/
