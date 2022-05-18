@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include "bisection.h"
+#include "print_routines.h"
 
 double bisection(double f(double,void*),double low, double high, void *p){
     
@@ -27,4 +28,28 @@ double bisection(double f(double,void*),double low, double high, void *p){
 		}
 	}
 	return low;
+}
+
+void multiple_zeros(double low, double high, double h, double f(double, void*), double zeros[], int N, void *p){
+
+	// ADD SOMETHING FOR THE CONTROL OF THE INPUT
+
+	int n = 0;
+	double var = low;
+	double f_min = f(var,p);
+	double f_next;
+
+	do{
+
+		f_next = f(var+h,p);
+
+		if(f_min * f_next < 0.0){
+			zeros[n] = bisection(f,var-h,var+h,p);
+			n++;
+			f_min = f_next;
+		}
+		var += h;
+
+	}while( n < N );
+
 }

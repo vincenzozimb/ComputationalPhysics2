@@ -6,6 +6,8 @@ add_library(myfunc
                     zeros_newton.c
                     integrate_trap.c
                     bessel_func.c
+                    array_routines.c
+                    lapack_wrappers.c
 )
 
 target_compile_options(myfunc PRIVATE -Wall -O3)

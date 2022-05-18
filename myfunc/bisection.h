@@ -29,4 +29,19 @@
  */
 double bisection(double f(double,void*),double low, double high, void *p);
 
+
+
+/**
+ * @brief Calculate a maximum of N zeros of the function f in the interval (low,high). // ACTUALLY NOT YET, ADD IN THE WHILE CONDITION "n<N || var<=high", but some problems. Solve   
+ * 
+ * @param low lower limit of the interval
+ * @param high higher limit of the interval 
+ * @param h ultraviolet cutoff
+ * @param f function whose zeros you want to compute
+ * @param zeros vector to be filled with the zeros of the function f
+ * @param N maximum number of zeros to be found
+ * @param p pointer to the struct containing the parameters of f
+ */
+void multiple_zeros(double low, double high, double h, double f(double, void*), double zeros[], int N, void *p);
+
 #endif
