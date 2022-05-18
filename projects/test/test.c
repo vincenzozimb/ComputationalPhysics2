@@ -3,94 +3,63 @@
 #include <complex.h>
 #include <math.h>
 
-#include "numerov.h"
+#include "bisection.h"
 #include "print_routines.h"
 
 /* typedef */
-typedef struct ParamF{
-    double xi,E;
-}ParamF;
+
 
 /* functions */
-double potential(double x);
-double F(double x, void *p);
-void solve_numerov(double x[], double v[], complex double psi[], double L, double dx, double F(double, void *), void *p, FILE *outfile);
-
-
+double func(double x, void *p);
+void fill_zero(double x[], int dim);
+void fill_one(double x[], int dim);
 
 /* ------------------------------------------- */
 int main(){
 
-    /* parameter */
-    double L = 10.0;
-    double dx = 1e-3;
+    double L = 12.2;
+    double h = 1e-2;
 
-    int dim = (int)(2.0 * L / dx);
+    // int dim = (int)(L/h);
 
-    double x[dim], v[dim];
-    complex double psi[dim];
+    void *p;
 
-    ParamF par;
-    par.xi = 1.0;
-    par.E = 1.0;
+    // double x;
+    // FILE *file;
+    // file = fopen("data.csv","w");
+    // for(int i=0; i<dim; i++){
+        
+    //     x = (i+1) * h;
+    //     fprint_double(file,x);
+    //     fprint_double_newline(file, func(x,&p));
 
-    double k = sqrt(par.E / par.xi);
+    // }
+    // fclose(file);
 
-    /* initial conditions */
-    psi[0] = cexp(-I*k*(-L));
-    psi[1] = cexp(-I*k*(-L+dx));
+    int n = 10;
+    double zeros[n];
+    fill_zero(zeros,n);
 
-    /* solve the equation */
-    FILE *file;
-    file = fopen("solution.csv","w");
-    solve_numerov(x,v,psi,L,dx,F,&par,file);
-    fclose(file);
+    multiple_zeros(h,L-h,h,func,zeros,n,&p);
+    fprint_vec(stdout,zeros,n);
+
 
 }
 /* ------------------------------------------- */
 
 /* functions */
-double potential(double x){
-    if(fabs(x) < 0.5){
-        return 1.0;
-    }else{
-        return 0.0;
-    }
+double func(double x, void *p){
+    return sin(M_PI * x) / x;
 }
 
-double F(double x, void *p){
-
-    ParamF *par = (ParamF *)p;
-    double xi = par->xi;
-    double E = par->E;
-
-    return (potential(x) - E) / xi;
-
-}
-
-void solve_numerov(double x[], double v[], complex double psi[], double L, double dx, double F(double, void *), void *p, FILE *outfile){
-
-    /* assuming the first two values of psi to be already initialized */
-    int dim = (int)(2.0 * L / dx);
-
-    x[0] = -L;
-    x[1] = x[0] + dx;
-    v[0] = potential(x[0]);
-    v[1] = potential(x[1]);
-
-    for(int i=2; i<dim; i++){
-        x[i] = x[i-1] + dx;
-        v[i] = potential(x[i]);
-        psi[i] = numerov_step(x[i-1],dx,psi[i-1],psi[i-2],F,p);
-    }
-
-    /* saving data */
+void fill_zero(double x[], int dim){
     for(int i=0; i<dim; i++){
-        fprint_double(outfile,x[i]);
-        fprint_double(outfile,v[i]);
-        fprint_double_newline(outfile,creal(psi[i]));
+        x[i] = 0.0;
     }
-
-
 }
 
+void fill_one(double x[], int dim){
+    for(int i=0; i<dim; i++){
+        x[i] = 1.0;
+    }
+}

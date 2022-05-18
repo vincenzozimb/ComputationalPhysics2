@@ -16,3 +16,4 @@ double potential(double r, double rho, double R){
     return 2.0 * M_PI * rho * pot;
 
 }
+
