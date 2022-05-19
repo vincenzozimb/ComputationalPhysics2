@@ -30,9 +30,7 @@ double bisection(double f(double,void*),double low, double high, void *p){
 	return low;
 }
 
-void multiple_zeros(double low, double high, double h, double f(double, void*), double zeros[], int N, void *p){
-
-	// ADD SOMETHING FOR THE CONTROL OF THE INPUT
+void multiple_zeros(double low, double h, double f(double, void*), double zeros[], int N, void *p){
 
 	int n = 0;
 	double var = low;
