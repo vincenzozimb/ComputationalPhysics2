@@ -86,4 +86,21 @@ void fprint_mat_complex(FILE *file, _Complex double (*A), int nrows, int ncols);
  */
 void fprint_two_vec(FILE *file, double v1[], double v2[], int dim);
 
+/**
+ * @brief Print three vectors in three columns to specified output.
+ * 
+ * Print the three vectors v1,v2 and v3 to the specified output.
+ * 
+ * @param file FILE pointer to the intended output file. To print to standard output, type stdout.
+ * @param v1 pointer to the first vector
+ * @param v2 pointer to the second vector
+ * @param v3 pointer to the third vector
+ * @param dim common dimension of the three vectors
+ * 
+ * @return void 
+ */
+void fprint_three_vec(FILE *file, double v1[], double v2[], double v3[], int dim);
+
+
 #endif
+
