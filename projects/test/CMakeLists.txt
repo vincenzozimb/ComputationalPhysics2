@@ -1,12 +1,12 @@
-add_executable(test test.c)
+add_executable(test test_diag.c)
 
 target_compile_options(test PRIVATE -Wall -O3)
 
-target_link_libraries(test m myfunc)
+target_link_libraries(test m myfunc lapack)
 
 # add custom commands
 add_custom_target(run-test
-    COMMAND test #&& gnuplot plot.gp
+    COMMAND test && gnuplot plot.gp
     DEPENDS test 
     WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
