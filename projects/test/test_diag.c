@@ -23,9 +23,9 @@ int main(){
     double R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
     double rho = 3.0 / (4.0 * M_PI * rs * rs * rs); // density of the jellium
 
-    double L = 3.0 * R;
+    double L = 3.0 * R; // infrared cutoff
     int dim = 950;
-    double h = L / dim;
+    double h = L / dim; // ultraviolet cutoff
 
     printf("\nThe ultraviolet cutoff is h=%lf\n",h);
     printf("R=%lf\n",R);
@@ -82,9 +82,62 @@ int main(){
 
 
 /* =============== */
-// double potential(double r, int l){
-//     return r * r / 2.0 + (double)l*(l+1)/(2*r*r);
-// }
+void solve_radialSE_diagonalize(int N, int l, double E[N], double psi[][N], double L, int dim, double pot(double, void*), void *p, int bol){
+
+    double h = L / dim; // ultraviolet cutoff
+    printf("The ultraviolet cutoff is h = %lf\n\n",h);
+
+    double r[dim], v[dim], d[dim], sd[dim-1];
+
+    /* position and potential */
+    for(int i=0; i<dim; i++){
+        r[i] = h * (i+1);
+        v[i] = pot(r[i],p) + (double)l*(l+1)/(2.0*r[i]*r[i]);
+    }
+
+    /* print potential */
+    if(bol == 1){
+        FILE *file;
+        file = fopen("potential.csv","w");
+        fprint_two_vec(file,r,v,dim);
+        fclose(file);
+    }
+
+    /* diagonal */
+    for(int i=0; i<dim; i++){
+        d[i] = 1/(h*h) + v[i];
+    }
+
+    /* subdiagonal */
+    for(int i=0; i<dim-1; i++){
+        sd[i] = - 1.0 / (2.0 * h * h);
+    }
+
+    /* diagonalization */
+    double eigval[dim];
+    double eigvec[dim][dim];
+
+    int info = diagonalize_tridiag_double(dim,d,sd,eigvec,eigval);
+    assert(info == 0);
+
+    /* print result */
+    int cnt = 0;
+    for(int i=0; i<dim; i++){
+        if(cnt < N || eigval[i] < 0.0){
+            printf("E_nl \t E_%d%d = %.3lf\n",cnt,l,eigval[i]);
+            E[cnt] = eigval[i];
+            cnt++;
+        }
+    }
+
+    for(int cnt=0; cnt<N; cnt++){
+        for(int i=0; i<dim; i++){
+            psi[i][cnt] = -eigvec[cnt][i];
+        }
+    }
+
+
+}
 
 double potential(double r, double rho, double R, int l){
 
