@@ -1,4 +1,4 @@
-add_executable(dft dft.c)
+add_executable(dft dft.c util.c)
 
 target_compile_options(dft PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)
