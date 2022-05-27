@@ -1,4 +1,4 @@
-add_executable(test test_diag.c)
+add_executable(test test.c)
 
 target_compile_options(test PRIVATE -Wall -O3)
 

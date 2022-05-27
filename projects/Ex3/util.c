@@ -9,33 +9,16 @@
 
 
 /* functions */
-void solve_radialSE_diagonalize(int N, int l, double E[], double psi[][N], double L, int dim, double pot(double, void*), void *p, int bol){
-
-    double h = L / dim; // ultraviolet cutoff
-
-    double r[dim], v[dim], d[dim], sd[dim-1];
-
-    /* position and potential */
-    
-    for(int i=0; i<dim; i++){
-        r[i] = h * (i+1);
-        v[i] = pot(r[i],p) + (double)l*(l+1)/(2.0*r[i]*r[i]);
-    }
-
-    /* print potential */
-    if(bol == 1){
-        FILE *file;
-        file = fopen("potential.csv","w");
-        fprint_two_vec(file,r,v,dim);
-        fclose(file);
-    }
+void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], double psi[][N], double h, int dim){
 
     /* diagonal */
+    double d[dim];
     for(int i=0; i<dim; i++){
         d[i] = 1/(h*h) + v[i];
     }
 
     /* subdiagonal */
+    double sd[dim-1];
     for(int i=0; i<dim-1; i++){
         sd[i] = - 1.0 / (2.0 * h * h);
     }
@@ -48,18 +31,20 @@ void solve_radialSE_diagonalize(int N, int l, double E[], double psi[][N], doubl
     assert(info == 0);
 
     /* print result */
-    int cnt = 0;
-    for(int i=0; i<dim; i++){
-        if(cnt < N && eigval[i] < 0.0){
-            printf("E_nl \t E_%d%d = %.3lf\n",cnt,l,eigval[i]);
-            E[cnt] = eigval[i];
-            cnt++;
-        }
-    }
+    // int cnt = 0;
+    // for(int i=0; i<dim; i++){
+    //     if(cnt < N && eigval[i] < 0.0){
+    //         printf("E_nl \t E_%d%d = %.3lf\n",cnt,l,eigval[i]);
+    //         E[cnt] = eigval[i];
+    //         cnt++;
+    //     }
+    // }
 
-    for(int j=0; j<N; j++){
-        for(int i=0; i<dim; i++){
-            psi[i][j] = -eigvec[j][i];
+    /* save results */
+    for(int i=0; i<N; i++){
+        E[i] = eigval[i];
+        for(int j=0; j<dim; j++){
+            psi[j][i] = -eigvec[i][j];
         }
     }
 
@@ -81,12 +66,6 @@ double potential(double r, void *p){
 
     pot *= 2.0 * M_PI * rho;
     return pot;
-
-}
-
-double harmonic(double r, void *p){
-
-    return 0.5 * r * r - 5.0;
 
 }
 
@@ -133,7 +112,16 @@ void normalize_single(double psi[], double dx, int dim){
     }
 }
 
-void print_wf(int N, double psi[][N], int dim, double h){
+void print_potential(double r[], double v[], int dim){
+
+    FILE *file;
+    file = fopen("potential.csv","w");
+    fprint_two_vec(file,r,v,dim);
+    fclose(file);
+
+}
+
+void print_wf(int N, double r[], double psi[][N], int dim, double h){
     
     FILE *file;
     file = fopen("wf.csv","w");
@@ -141,9 +129,9 @@ void print_wf(int N, double psi[][N], int dim, double h){
     for(int i=0; i<dim; i++){
         for(int j=0; j<N+1; j++){
             if(j==0){
-                fprint_double(file,h*(i+1));
+                fprint_double(file,r[i]);
             }else{
-                fprint_double(file,psi[i][j]);
+                fprint_double(file,psi[i][j-1]);
             }
         }
         fprintf(file,"\n");
@@ -153,3 +141,27 @@ void print_wf(int N, double psi[][N], int dim, double h){
 
 }
 
+void fill_position(double r[], double h, int dim){
+    
+    for(int i=0; i<dim; i++){
+        r[i] = h * (i+1);
+    }
+    
+}
+
+void fill_potential(double r[], double v[], int l, int dim, void *p){
+        
+    for(int i=0; i<dim; i++){
+        v[i] = potential(r[i],p) + (double)l*(l+1)/(2.0*r[i]*r[i]);
+    }
+}
+
+void density(int N, double n[], double psi[][N], int dim){
+
+    for(int i=0; i<dim; i++){
+        for(int j=0; j<N; j++){
+            n[i] = psi[i][j] * psi[i][j];
+        }
+    }
+
+}
