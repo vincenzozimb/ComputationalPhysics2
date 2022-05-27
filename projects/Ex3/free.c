@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <assert.h>
 
 #include "util.h"
 #include "print_routines.h"
@@ -30,91 +29,60 @@ int main(){
 
 
     /* Solving the SE for the non interacting electrons, in total we will have 4 orbitals (0s 0p 0d 1s) */
-    double r[dim], E[4], psi[dim][4];
+    int Nb;
+    double E[4], r[dim], v[dim], n[dim];
+
+    for(int i=0; i<dim; i++){
+        n[i] = 0.0;
+    }
+
     fill_position(r,h,dim);
-
-    /* 0s and 1s orbitals */
-    int ls = 0;
-    int Nbs = 2;
-
-    double vs[dim], Es[Nbs], psis[dim][Nbs];
-
-    fill_potential(r,vs,ls,dim,&par);
-    solve_radialSE_diagonalize(Nbs,r,vs,Es,psis,h,dim);    
-    normalize(Nbs,psis,h,dim);
-    fprint_vec(stdout,Es,Nbs);
-
-    for(int i=0; i<Nbs; i++){
-        E[i] = Es[i];
-    }
-    for(int i=0; i<dim; i++){
-        for(int j=0; j<Nbs; j++){
-            psi[i][j] = psis[i][j];
-        }
-    }
-
-    /* 0p orbital */
-    int lp = 1;
-    int Nbp = 1;
-
-    double vp[dim], Ep[Nbp], psip[dim][Nbp];
-
-    fill_potential(r,vp,lp,dim,&par);
-    solve_radialSE_diagonalize(Nbp,r,vp,Ep,psip,h,dim);    
-    normalize(Nbp,psip,h,dim);
-    fprint_vec(stdout,Ep,Nbp);
-
-    for(int i=Nbs; i<Nbs+Nbp; i++){
-        E[i] = Ep[i];
-    }
-    for(int i=0; i<dim; i++){
-        for(int j=Nbs; j<Nbs+Nbp; j++){
-            psi[i][j] = psip[i][j];
-        }
-    }
-
-    /* 0d orbital */
-    int ld = 2;
-    int Nbd = 1;
-
-    double vd[dim], Ed[Nbd], psid[dim][Nbd];
-
-    fill_potential(r,vd,ld,dim,&par);
-    solve_radialSE_diagonalize(Nbd,r,vd,Ed,psid,h,dim);    
-    normalize(Nbd,psid,h,dim);
-    fprint_vec(stdout,Ed,Nbd);
     
-    for(int i=Nbs+Nbp; i<Nbs+Nbp+Nbd; i++){
-        E[i] = Ed[i];
-    }
-    for(int i=0; i<dim; i++){
-        for(int j=Nbs+Nbp; j<Nbs+Nbp+Nbd; j++){
-            psi[i][j] = psid[i][j];
+    for(int l=0; l<3; l++){
+        if(l == 0){
+            Nb = 2;
+            char name[] = "s.csv"; 
+            double psi[dim][Nb];
+            fill_potential(r,v,l,dim,&par);
+            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
+            normalize(Nb,psi,h,dim);
+            add_density(Nb,r,n,psi,dim,l);
+            print_wf(Nb,r,psi,dim,h,name);
+
+        }else if(l==1){
+            Nb = 1;
+            char name[] = "p.csv";
+            double psi[dim][Nb];
+            fill_potential(r,v,l,dim,&par);
+            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
+            normalize(Nb,psi,h,dim);
+            add_density(Nb,r,n,psi,dim,l);
+            print_wf(Nb,r,psi,dim,h,name);
+
+        }else{
+            Nb = 1;
+            char name[] = "d.csv";
+            double psi[dim][Nb];
+            fill_potential(r,v,l,dim,&par);
+            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
+            normalize(Nb,psi,h,dim);
+            add_density(Nb,r,n,psi,dim,l);
+            print_wf(Nb,r,psi,dim,h,name);
         }
     }
 
-    print_wf(4,r,psi,dim,h);
-    fprint_vec(stdout,E,4);
+    char name[] = "density.csv";
+    print_func(r,n,dim,name);
 
-
-    /* density */
-    // double n[dim];
-
-    // density(Nb,r,n,psi,h,dim);
-    // FILE *file;
-    // file = fopen("density.csv","w");
-    // fprint_two_vec(file,r,n,dim);
-    // fclose(file);
-
-    // double norm = 0.0;
-    // for(int i=0; i<dim; i++){
-    //     norm += n[i]*n[i];
-    // }
-    // norm *= h;
-    // printf("Norm = %lf\n",norm);
-
+    double norm = 0.0;
+    for(int i=0; i<dim; i++){
+        norm += n[i] * r[i] * r[i];
+    }
+    norm *= 4.0 * M_PI * h;
+    printf("N = %lf\n",norm);
 
     printf("\n");
+
 
 }
 

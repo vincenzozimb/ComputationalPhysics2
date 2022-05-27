@@ -44,7 +44,7 @@ void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], doubl
     for(int i=0; i<N; i++){
         E[i] = eigval[i];
         for(int j=0; j<dim; j++){
-            psi[j][i] = -eigvec[i][j];
+            psi[j][i] = -eigvec[i][j] / r[j];   // in this way it return the R(r)
         }
     }
 
@@ -79,7 +79,7 @@ void normalize(int N, double psi[][N], double h, int dim){
     
     for(int i=0; i<N;i++){
         for(int j=0; j<dim; j++){
-            norm[i] += psi[j][i] * psi[j][i];
+            norm[i] += (psi[j][i] * psi[j][i]) * pow(h*(j+1),2.0);
         }
         norm[i] *= h;
         norm[i] = sqrt(norm[i]);
@@ -112,19 +112,23 @@ void normalize_single(double psi[], double dx, int dim){
     }
 }
 
-void print_potential(double r[], double v[], int dim){
+void print_func(double r[], double v[], int dim, char name[15]){
+
+    // no controllo input
 
     FILE *file;
-    file = fopen("potential.csv","w");
+    file = fopen(name,"w");
     fprint_two_vec(file,r,v,dim);
     fclose(file);
 
 }
 
-void print_wf(int N, double r[], double psi[][N], int dim, double h){
+void print_wf(int N, double r[], double psi[][N], int dim, double h, char name[6]){
     
+    // no controllo input
+
     FILE *file;
-    file = fopen("wf.csv","w");
+    file = fopen(name,"w");
     
     for(int i=0; i<dim; i++){
         for(int j=0; j<N+1; j++){
@@ -156,11 +160,11 @@ void fill_potential(double r[], double v[], int l, int dim, void *p){
     }
 }
 
-void density(int N, double n[], double psi[][N], int dim){
+void add_density(int N, double r[], double n[], double psi[][N], int dim, int l){
 
     for(int i=0; i<dim; i++){
         for(int j=0; j<N; j++){
-            n[i] = psi[i][j] * psi[i][j];
+            n[i] += 2.0 * psi[i][j]*psi[i][j] * ((double)(2*l+1) / (4.0*M_PI));
         }
     }
 
