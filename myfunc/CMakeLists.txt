@@ -11,4 +11,6 @@ add_library(myfunc
 )
 
 target_compile_options(myfunc PRIVATE -Wall -O3)
-target_link_libraries(myfunc m)
+# target_link_libraries(myfunc m)
+find_package(GSL REQUIRED)
+target_link_libraries(myfunc m lapack GSL::gsl GSL::gslcblas)
