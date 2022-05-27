@@ -19,7 +19,7 @@ int main(){
 
 
     /* code parameters */
-    double L = 3.0 * R; // infrared cutoff. Space interval goes from 0 from L
+    double L = 2.0 * R; // infrared cutoff. Space interval goes from 0 from L
     int dim = 900; // number of discretizations in the finite difference method
     double h = L / dim; // ultraviolet cutoff
 
@@ -71,15 +71,16 @@ int main(){
         }
     }
 
+    /* print density and check its normalization */
     char name[] = "density.csv";
     print_func(r,n,dim,name);
 
-    double norm = 0.0;
+    double tot = 0.0;
     for(int i=0; i<dim; i++){
-        norm += n[i] * r[i] * r[i];
+        tot += n[i] * r[i] * r[i];
     }
-    norm *= 4.0 * M_PI * h;
-    printf("N = %lf\n",norm);
+    tot *= 4.0 * M_PI * h;
+    printf("The intregral of the density is: N = %lf\n",tot);
 
     printf("\n");
 
