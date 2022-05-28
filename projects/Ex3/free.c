@@ -9,7 +9,7 @@
 int main(){
 
     /* system parameters */
-    int N = 20; // number of electrons
+    int N = 40; // number of electrons
     double rs = 3.93; // 3.93 for Na and 4.86 for K
 
     double R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
@@ -27,49 +27,176 @@ int main(){
     printf("The infrared cutoff is L = %lf\n",L);
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
-
-    /* Solving the SE for the non interacting electrons, in total we will have 4 orbitals (0s 0p 0d 1s) */
-    int Nb;
-    double E[4], r[dim], v[dim], n[dim];
+    int Nb, cnt;
+    double r[dim], v[dim], n[dim];
 
     for(int i=0; i<dim; i++){
         n[i] = 0.0;
     }
 
     fill_position(r,h,dim);
-    
-    for(int l=0; l<3; l++){
-        if(l == 0){
-            Nb = 2;
-            char name[] = "s.csv"; 
-            double psi[dim][Nb];
-            fill_potential(r,v,l,dim,&par);
-            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
-            normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
-            print_wf(Nb,r,psi,dim,h,name);
 
-        }else if(l==1){
-            Nb = 1;
-            char name[] = "p.csv";
-            double psi[dim][Nb];
-            fill_potential(r,v,l,dim,&par);
-            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
-            normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
-            print_wf(Nb,r,psi,dim,h,name);
+    double *E, *eps;
 
-        }else{
-            Nb = 1;
-            char name[] = "d.csv";
-            double psi[dim][Nb];
-            fill_potential(r,v,l,dim,&par);
-            solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);
-            normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
-            print_wf(Nb,r,psi,dim,h,name);
+
+    switch (N)
+    {
+    case 8:
+        /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
+        cnt = 0;
+        E = malloc(2);
+        eps = malloc(1);
+
+        for(int l=0; l<2; l++){
+            if(l == 0){
+                Nb = 1;
+                char name[] = "s.csv"; 
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else{
+                Nb = 1;
+                char name[] = "p.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }
         }
+
+        fprint_vec(stdout,E,2);
+        
+        break;
+
+    case 20:
+        /* Solving the SE for N = 20 non interacting electrons, in total we will have 4 orbitals (0s 0p 0d 1s) */
+        cnt = 0;
+        E = malloc(4);
+        eps = malloc(2);
+
+        for(int l=0; l<3; l++){
+            if(l == 0){
+                Nb = 2;
+                char name[] = "s.csv"; 
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else if(l==1){
+                Nb = 1;
+                char name[] = "p.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else{
+                Nb = 1;
+                char name[] = "d.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }
+        }
+
+        fprint_vec(stdout,E,4);
+        
+        break;
+
+    case 40:
+        /* Solving the SE for N = 40 non interacting electrons, in total we will have 6 orbitals (0s 0p 0d 1s 0f 1p) */
+        cnt = 0;
+        E = malloc(6);
+        eps = malloc(2);
+
+        for(int l=0; l<4; l++){
+            if(l == 0){
+                Nb = 2;
+                char name[] = "s.csv"; 
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else if(l==1){
+                Nb = 2;
+                char name[] = "p.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else if(l==2){
+                Nb = 1;
+                char name[] = "d.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+
+            }else{
+                Nb = 1;
+                char name[] = "f.csv";
+                double psi[dim][Nb];
+                fill_potential(r,v,l,dim,&par);
+                solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                print_wf(Nb,r,psi,dim,h,name);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
+            }
+        }
+
+        fprint_vec(stdout,E,4);
+        
+        break;
+    
+    default:
+        
+        printf("Wrong number of electrons\n");
+        break;
     }
+
+
 
     /* print density and check its normalization */
     char name[] = "density.csv";

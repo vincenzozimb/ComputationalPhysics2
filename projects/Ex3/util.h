@@ -17,6 +17,6 @@ void print_wf(int N, double r[], double psi[][N], int dim, double h, char name[6
 void fill_position(double r[], double h, int dim);
 void fill_potential(double r[], double v[], int l, int dim, void *p);
 void add_density(int N, double r[], double n[], double psi[][N], int dim, int l);
-
+void add_energy(int *cnt, double E[], double eps[], int Nb);
 
 #endif

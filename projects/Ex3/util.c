@@ -169,3 +169,11 @@ void add_density(int N, double r[], double n[], double psi[][N], int dim, int l)
     }
 
 }
+
+void add_energy(int *cnt, double E[], double eps[], int Nb){
+
+    for(int i=(*cnt); i<(*cnt)+Nb; i++){
+        E[i] = eps[i-(*cnt)]; 
+    }
+
+}
