@@ -80,7 +80,12 @@ int main(){
         }
     }
 
-    fprint_vec(stdout,E,4);
+    printf("The energies E_ln are:\n");
+    printf("E_%d%d = %lf\n",0,0,E[0]);
+    printf("E_%d%d = %lf\n",0,1,E[1]);
+    printf("E_%d%d = %lf\n",1,0,E[2]);
+    printf("E_%d%d = %lf\n",2,0,E[3]);
+    printf("\n");  
     
     /* print density and check its normalization */
     char name[] = "density.csv";

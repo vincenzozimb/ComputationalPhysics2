@@ -69,8 +69,10 @@ int main(){
         }
     }
 
-    fprint_vec(stdout,E,2);
-
+    printf("The energies E_ln are:\n");
+    printf("E_%d%d = %lf\n",0,0,E[0]);
+    printf("E_%d%d = %lf\n",1,0,E[1]);
+    printf("\n"); 
 
 
     /* print density and check its normalization */
