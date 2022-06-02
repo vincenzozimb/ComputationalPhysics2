@@ -7,6 +7,9 @@
 #include "print_routines.h"
 #include "lapack_wrappers.h"
 
+/* global variables */
+int N;
+double rs, R, rho;
 
 /* functions */
 void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], double psi[][N], double h, int dim){
@@ -29,16 +32,6 @@ void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], doubl
 
     int info = diagonalize_tridiag_double(dim,d,sd,eigvec,eigval);
     assert(info == 0);
-
-    /* print result */
-    // int cnt = 0;
-    // for(int i=0; i<dim; i++){
-    //     if(cnt < N && eigval[i] < 0.0){
-    //         printf("E_nl \t E_%d%d = %.3lf\n",cnt,l,eigval[i]);
-    //         E[cnt] = eigval[i];
-    //         cnt++;
-    //     }
-    // }
 
     /* save results */
     for(int i=0; i<N; i++){
@@ -94,7 +87,7 @@ void normalize(int N, double psi[][N], double h, int dim){
     
 }
 
-void normalize_single(double psi[], double dx, int dim){
+void normalize_single(double psi[], double dx, int dim, double multiplier){
     /* calculate norm */
     double norm = 0.0;
     
@@ -104,7 +97,7 @@ void normalize_single(double psi[], double dx, int dim){
     norm *= dx;
     norm = sqrt(norm);
 
-    norm /= 10.0;
+    norm /= multiplier;
 
     /* normalize */
     for(int i=0; i<dim; i++){
@@ -112,7 +105,7 @@ void normalize_single(double psi[], double dx, int dim){
     }
 }
 
-void print_func(double r[], double v[], int dim, char name[15]){
+void print_func(double r[], double v[], int dim, char name[25]){
 
     // no controllo input
 
@@ -125,7 +118,7 @@ void print_func(double r[], double v[], int dim, char name[15]){
 
 void print_wf(int N, double r[], double psi[][N], int dim, double h, char name[6]){
     
-    // no controllo input
+    // no controllo input. Assume for name the spectroscopic notation
 
     FILE *file;
     file = fopen(name,"w");
@@ -143,6 +136,12 @@ void print_wf(int N, double r[], double psi[][N], int dim, double h, char name[6
 
     fclose(file);
 
+}
+
+void fill_zero(double v[], int dim){
+    for(int i=0; i<dim; i++){
+        v[i] = 0.0;
+    }
 }
 
 void fill_position(double r[], double h, int dim){
@@ -175,5 +174,79 @@ void add_energy(int *cnt, double E[], double eps[], int Nb){
     for(int i=(*cnt); i<(*cnt)+Nb; i++){
         E[i] = eps[i-(*cnt)]; 
     }
+
+}
+
+void exchange_pot(double ex[], double n[], int dim){
+    for(int i=0; i<dim; i++){
+        ex[i] = -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
+    }
+}
+
+void add_correlation_pot(double ec[], int dim){
+    
+    ParamEc p = {1.0, 0.031091, 0.21370, 7.5957, 3.5876, 1.6382, 0.49294};
+    double K;
+    K = 2.0 * p.A * (p.beta1 * pow(rs,0.5) + p.beta2 * rs + p.beta3 * pow(rs,1.5) + p.beta4 * pow(rs,p.p+1.0));
+    K = 1.0 + 1.0/K; 
+    K = log(K);
+    K *= -2.0 * p.A * (1.0 + p.alpha1 * rs);
+
+    for(int i=0; i<dim; i++){
+        ec[i] += K;
+    }
+}
+
+void add_coulomb_pot(double vh[], double r[], double n[], double h, int dim){
+
+    double K = 0.0;
+    for(int i=0; i<dim; i++){
+        K += r[i] * r[i] * n[i];
+    }
+    K *= h;
+
+    for(int i=0; i<dim; i++){
+        vh[i] += K * 4.0 * M_PI / r[i];  
+    } 
+
+}
+
+void partial_pot(double pot[], double r[], int dim, int l, void *p){
+
+    // external and correlation potential, they do not depend on the density    
+    fill_zero(pot,dim);
+    add_correlation_pot(pot,dim);
+    
+    for(int i=0; i<dim; i++){
+        pot[i] += potential(r[i],p);
+    }
+
+}
+
+void change_pot(double pot[], double n[], double r[], double h, int dim){
+
+    // the coulomb and the exchange potential do depend on the density
+    add_coulomb_pot(pot,r,n,h,dim);
+    add_correlation_pot(pot,dim);
+
+}
+
+void copy_vec(double copy[], double paste[], int dim){
+
+    for(int i=0; i<dim; i++){
+        paste[i] = copy[i];
+    }
+
+}
+
+double euclidean_distance(double v1[], double v2[], int dim){
+
+    double ris = 0.0;
+    for(int i=0; i<dim; i++){
+        ris += pow(v1[i]-v2[i],2.0);
+    }
+    ris = sqrt(ris);
+
+    return ris;
 
 }

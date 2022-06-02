@@ -8,6 +8,6 @@ plot 's.csv' using 1:2 w lines title "0s" ,\
 
 pause -1
     
-plot 'density.csv' using 1:2 w lines title "electron density"
+plot 'density_free.csv' using 1:2 w lines title "electron density"
 
 pause -1

@@ -1,5 +1,5 @@
 ###########################################################
-add_executable(free free.c util.c)
+add_executable(free free.c)
 
 target_compile_options(free PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)

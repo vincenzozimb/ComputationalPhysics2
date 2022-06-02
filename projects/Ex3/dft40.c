@@ -28,12 +28,9 @@ int main(){
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
     int Nb, cnt;
-    double r[dim], v[dim], n[dim];
+    double r[dim], v[dim], n_free[dim];
 
-    for(int i=0; i<dim; i++){
-        n[i] = 0.0;
-    }
-
+    fill_zero(n_free,dim);
     fill_position(r,h,dim);
 
 
@@ -49,7 +46,7 @@ int main(){
             fill_potential(r,v,l,dim,&par);
             solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
             normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
+            add_density(Nb,r,n_free,psi,dim,l);
             print_wf(Nb,r,psi,dim,h,name);
             add_energy(&cnt,E,eps,Nb);
             cnt += Nb;
@@ -61,7 +58,7 @@ int main(){
             fill_potential(r,v,l,dim,&par);
             solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
             normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
+            add_density(Nb,r,n_free,psi,dim,l);
             print_wf(Nb,r,psi,dim,h,name);
             add_energy(&cnt,E,eps,Nb);
             cnt += Nb;
@@ -73,7 +70,7 @@ int main(){
             fill_potential(r,v,l,dim,&par);
             solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
             normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
+            add_density(Nb,r,n_free,psi,dim,l);
             print_wf(Nb,r,psi,dim,h,name);
             add_energy(&cnt,E,eps,Nb);
             cnt += Nb;
@@ -85,7 +82,7 @@ int main(){
             fill_potential(r,v,l,dim,&par);
             solve_radialSE_diagonalize(Nb,r,v,eps,psi,h,dim);
             normalize(Nb,psi,h,dim);
-            add_density(Nb,r,n,psi,dim,l);
+            add_density(Nb,r,n_free,psi,dim,l);
             print_wf(Nb,r,psi,dim,h,name);
             add_energy(&cnt,E,eps,Nb);
             cnt += Nb;
@@ -103,12 +100,12 @@ int main(){
 
 
     /* print density and check its normalization */
-    char name[] = "density.csv";
-    print_func(r,n,dim,name);
+    char name[] = "density_free.csv";
+    print_func(r,n_free,dim,name);
 
     double tot = 0.0;
     for(int i=0; i<dim; i++){
-        tot += n[i] * r[i] * r[i];
+        tot += n_free[i] * r[i] * r[i];
     }
     tot *= 4.0 * M_PI * h;
     printf("The intregral of the density is: N = %lf\n",tot);
