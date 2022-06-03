@@ -118,6 +118,7 @@ int main(){
     
     print_func(r,n,dim,"density.csv");
     density_integral(n);
+    printf("\n");
 
 
 }
