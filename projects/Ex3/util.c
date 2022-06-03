@@ -63,13 +63,11 @@ double potential(double r, void *p){
 }
 
 void normalize(int N, double psi[][N], double h, int dim){
-    
     /* calculate norm */
     double norm[N];
     for(int i=0; i<N; i++){
         norm[i] = 0.0;
     }
-    
     for(int i=0; i<N;i++){
         for(int j=0; j<dim; j++){
             norm[i] += (psi[j][i] * psi[j][i]) * pow(h*(j+1),2.0);
@@ -77,14 +75,12 @@ void normalize(int N, double psi[][N], double h, int dim){
         norm[i] *= h;
         norm[i] = sqrt(norm[i]);
     }
-
     /* normalize */
     for(int i=0; i<N; i++){
         for(int j=0; j<dim; j++){
             psi[j][i] /= norm[i];
         }
     }
-    
 }
 
 void normalize_single(double psi[], double dx, int dim, double multiplier){
@@ -160,13 +156,11 @@ void fill_potential(double r[], double v[], int l, int dim, void *p){
 }
 
 void add_density(int N, double r[], double n[], double psi[][N], int dim, int l){
-
     for(int i=0; i<dim; i++){
         for(int j=0; j<N; j++){
             n[i] += 2.0 * psi[i][j]*psi[i][j] * ((double)(2*l+1) / (4.0*M_PI));
         }
     }
-
 }
 
 void add_energy(int *cnt, double E[], double eps[], int Nb){

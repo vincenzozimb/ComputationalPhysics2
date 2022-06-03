@@ -1,7 +1,11 @@
+/* ========================= ACTUALLY THIS IS THE NEW dft8.c ========================= */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
+#include <stdbool.h>
 
+#include "lapack_wrappers.h"
 #include "print_routines.h"
 
 /* ======================= TYPEDEF ======================= */
@@ -9,31 +13,43 @@ typedef struct ParamPot{
     double R,rho;
 }ParamPot;
 
+typedef struct ParamEc{
+    double p, A, alpha1, beta1, beta2, beta3, beta4;
+}ParamEc;
 
 /* ======================= GLOBAL VARIABLES ======================= */
-int N;
+#define N 8 // number of electrons
+#define dim 500 // number of discretization points in the finite difference method
+
 double rs, R, rho;
 ParamPot par;
 
+double L, h;
+double r[dim];
+
 
 /* ======================= FUNCTION HEADERS ======================= */
-void fill_position(double r[], double h, int dim);
-double potential(double r);
-void fill_potential(double v[], double r[], int l, int dim);
-void fill_F(double F[], double v[], double E, int dim);
-void initial_conditions(double r[], double psi[], int l);
-void fill_psi(double psi[], double F[], double h, int dim);
-void normalize(double psi[], double h, int dim);
-double shooting(double E, double r[], double v[], double h, int l, int dim);
+void fill_zero(double a[], int len);
+void copy_vec(double copy[], double paste[], int len);
+void fill_position();
+double pot_ext(double r, void *p);
+void add_pot_corr(double v[]);
+void fill_pot_unch(double v[], bool free);
+void add_pot_centr(double v[], int l);
 
+void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
+void normalize(int Nb, double psi[][Nb]);
+void add_density(int Nb, double n[], double psi[][Nb], int l);
+void solve_first_closed_shell(double E[2], double n[], double v[]);
+void density_integral(double n[]);
+
+void print_func(double a[], double b[], int len, char name[25]);
 
 /* ======================= MAIN ======================= */
 int main(){
 
     /* system parameters */
-    N = 20; // number of electrons
     rs = 3.93; // 3.93 for Na and 4.86 for K
-
     R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
     rho = 3.0 / (4.0 * M_PI * rs * rs * rs); // density of the jellium
 
@@ -42,78 +58,68 @@ int main(){
 
 
     /* code parameters */
-    double L = 2.5 * R; // infrared cutoff. Space interval goes from 0 from L
-    double h = 1e-3; // ultraviolet cutoff
-    int dim = (int)(L/h);
+    L = 2.5 * R; // infrared cutoff. Space interval goes from 0 from L
+    h = L / dim; // ultraviolet cutoff
    
     printf("\nThe characteristic radius of the cluster is R = %lf\n",R);
     printf("The infrared cutoff is L = %lf\n",L);
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
+    bool free;
+
 
     /* variables */
-    double r[dim], v[dim];
+    double v[dim], n_free[dim];
+    double E[2];
 
-    int l = 0;
+    fill_position();
 
-    fill_position(r,h,dim);
-    fill_potential(v,r,l,dim);
+
+    /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
+    fill_pot_unch(v,free=true);
+    solve_first_closed_shell(E,n_free,v);
+    print_func(r,n_free,dim,"density.csv");
+    fprint_vec(stdout,E,2);
+    density_integral(n_free);
+
+
+    /* Interacting electrons */
+
     
-    /* solving */
-    double E = -2.8;
-    double F[dim], psi[dim];
 
-    FILE *file;
-    file = fopen("wf.csv","w");
-
-    fill_F(F,v,E,dim);
-    initial_conditions(r,psi,l);
-    fill_psi(psi,F,h,dim);
-    normalize(psi,h,dim);
-    fprint_two_vec(file,r,psi,dim);
-
-    fclose(file);
-
-    double dE = 0.01;
-    E = -2.0 * M_PI * rho * R * R + dE;
-    double E_max = 0.0;
-
-    file = fopen("data.csv","w");
-    do{
-        fprint_double(file,E);
-        fprint_double_newline(file,shooting(E,r,v,h,l,dim));
-        printf("E = %lf\n",E);
-        E += dE;
-    }while(E<E_max);
-    fclose(file);
-
-
-
-
-
-
-
-
-
-
-
-
-    // FILE *file;
-    // file = fopen("data.csv","w");
-    // fprint_two_vec(file,r,v,dim);
-    // fclose(file);
 
 }
 
 
 /* ======================= FUNCTION BODIES ======================= */
-void fill_position(double r[], double h, int dim){
+// array functions
+void fill_zero(double a[], int len){
+    // initialize all the elements of the vector to zero
+    for(int i=0; i<len; i++){
+        a[i] = 0.0;
+    }
+}
+
+void copy_vec(double copy[], double paste[], int len){
+    // copy the vector copy[len] into the vector paste[len]
+    for(int i=0; i<len; i++){
+        paste[i] = copy[i];
+    }
+}
+
+void fill_position(){
+    // fill the position vector
     for(int i=0; i<dim; i++){
         r[i] = (i+1) * h;
     }
 }
 
-double potential(double r){
+double pot_ext(double r, void *p){
+    // analytic functional expression for the external potential
+    ParamPot *par = (ParamPot *)p;
+
+    double R = par->R;
+    double rho = par->rho;
 
     double pot;
     if(r <= R){
@@ -127,56 +133,149 @@ double potential(double r){
 
 }
 
-void fill_potential(double v[], double r[], int l, int dim){
+void add_pot_corr(double v[]){
+    // add the correlation potential
+    ParamEc p = {1.0, 0.031091, 0.21370, 7.5957, 3.5876, 1.6382, 0.49294};
+    double K;
+    K = 2.0 * p.A * (p.beta1 * pow(rs,0.5) + p.beta2 * rs + p.beta3 * pow(rs,1.5) + p.beta4 * pow(rs,p.p+1.0));
+    K = 1.0 + 1.0/K; 
+    K = log(K);
+    K *= -2.0 * p.A * (1.0 + p.alpha1 * rs);
+
     for(int i=0; i<dim; i++){
-        v[i] = potential(r[i]) + (double)l*(l+1) / (2.0*r[i]*r[i]);
+        v[i] += K;
     }
 }
 
-void fill_F(double F[], double v[], double E, int dim){
+void fill_pot_unch(double v[], bool free){
+    // fill the vector v[dim] with the unchanged (or unchanging ? LoL) part of the potential
     for(int i=0; i<dim; i++){
-        F[i] = 2.0 * (v[i] - E);
+        v[i] = pot_ext(r[i],&par);
+    }
+    if(!free){
+        add_pot_corr(v);
     }
 }
 
-void initial_conditions(double r[], double psi[], int l){
-    psi[0] = pow(r[0],l+1);
-    psi[1] = pow(r[1],l+1);
-}
-
-void fill_psi(double psi[], double F[], double h, int dim){
-    for(int i=2; i<dim; i++){
-        psi[i] = (2.0 + 5.0/6.0*h*h*F[i-1])*psi[i-1];
-        psi[i] -= (1.0 -h*h/12.0*F[i-2])*psi[i-2];
-        psi[i] /= 1.0-h*h/12.0*F[i];
+void add_pot_centr(double v[], int l){
+    // add the centrifugal barrier to the potential vector
+    for(int i=0; i<dim; i++){
+        v[i] += (double)l*(l+1)/(2.0*r[i]*r[i]);
     }
 }
 
-void normalize(double psi[], double h, int dim){
+// routines
+void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]){
+    // Diagonalize the SE with the finite difference method (i.e. using as a basis the position eigenstates),
+    // finding the first Nb bound states of the potential in v[dim], and save the results in E[dim] and psi[dim][Nb]
+
+    /* diagonal */
+    double d[dim];
+    for(int i=0; i<dim; i++){
+        d[i] = 1/(h*h) + v[i];
+    }
+
+    /* subdiagonal */
+    double sd[dim-1];
+    for(int i=0; i<dim-1; i++){
+        sd[i] = - 1.0 / (2.0 * h * h);
+    }
+
+    /* diagonalization */
+    double eigval[dim];
+    double eigvec[dim][dim];
+
+    int info = diagonalize_tridiag_double(dim,d,sd,eigvec,eigval);
+    assert(info == 0);
+
+    /* save results */
+    for(int i=0; i<Nb; i++){
+        E[i] = eigval[i];
+        for(int j=0; j<dim; j++){
+            psi[j][i] = -eigvec[i][j] / r[j];   // in this way it return the R(r)
+        }
+    }
+
+}
+
+void normalize(int Nb, double psi[][Nb]){
+    // Normalize the Nb orbitals contained in psi[dim][N]
     
-    double norm = 0.0;
-    for(int i=0; i<dim; i++){
-        norm += psi[i] * psi[i];
+    /* calculate norm */
+    double norm[Nb];
+    for(int i=0; i<Nb; i++){
+        norm[i] = 0.0;
     }
-    norm *= h;
-    norm = sqrt(norm);
-
-    for(int i=0; i<dim; i++){
-        psi[i] /= norm;
+    for(int i=0; i<Nb;i++){
+        for(int j=0; j<dim; j++){
+            norm[i] += (psi[j][i] * psi[j][i]) * pow(h*(j+1),2.0);
+        }
+        norm[i] *= h;
+        norm[i] = sqrt(norm[i]);
     }
-
+    /* normalize */
+    for(int i=0; i<Nb; i++){
+        for(int j=0; j<dim; j++){
+            psi[j][i] /= norm[i];
+        }
+    }
 }
 
-double shooting(double E, double r[], double v[], double h, int l, int dim){
-
-    double F[dim], psi[dim];
-
-    fill_F(F,v,E,dim);
-    initial_conditions(r,psi,l);
-    fill_psi(psi,F,h,dim);
-    normalize(psi,h,dim);
-
-    return psi[dim-1];
-
+void add_density(int Nb, double n[], double psi[][Nb], int l){
+    // use the Nb orbitals in psi[dim][Nb] to update the density
+    for(int i=0; i<dim; i++){
+        for(int j=0; j<Nb; j++){
+            n[i] += 2.0 * psi[i][j]*psi[i][j] * ((double)(2*l+1) / (4.0*M_PI));
+        }
+    }
 }
 
+void solve_first_closed_shell(double E[2], double n[], double v[]){
+    // diagonalize the SE for the 0s and 0p orbitals. Calculate the energies and fill the density array.
+    double pot[dim];
+    int l;
+    
+    int Nb = 1;
+    double en[Nb], psi[dim][Nb];
+
+    fill_zero(n,dim);
+
+    // 0s
+    copy_vec(v,pot,dim);
+    l = 0; Nb = 1;
+    add_pot_centr(pot,l);
+    solve_radialSE_diagonalize(Nb,pot,en,psi);
+    normalize(Nb,psi);
+    add_density(Nb,n,psi,l);
+    E[0] = en[0];
+
+    // 0p
+    copy_vec(v,pot,dim);
+    l = 1; Nb = 1;
+    add_pot_centr(pot,l);
+    solve_radialSE_diagonalize(Nb,pot,en,psi);
+    normalize(Nb,psi);
+    add_density(Nb,n,psi,l);
+    E[1] = en[0];
+   
+}
+
+void density_integral(double n[]){
+    // Calculate the integral of the density and print the result. It should be equal to the number of electrons
+    double tot = 0.0;
+    for(int i=0; i<dim; i++){
+        tot += n[i] * r[i] * r[i];
+    }
+    tot *= 4.0 * M_PI * h;
+    printf("The intregral of the density is: N = %lf\n\n",tot);
+}
+
+// print functions
+void print_func(double a[], double b[], int len, char name[25]){
+    // no input control
+    // Print on file the two array
+    FILE *file;
+    file = fopen(name,"w");
+    fprint_two_vec(file,a,b,len);
+    fclose(file);
+}
