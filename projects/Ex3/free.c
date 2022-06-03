@@ -20,6 +20,7 @@ typedef struct ParamEc{
 /* ======================= GLOBAL VARIABLES ======================= */
 #define N 8 // number of electrons
 #define dim 500 // number of discretization points in the finite difference method
+#define EPS 1e-3
 
 double rs, R, rho;
 ParamPot par;
@@ -36,12 +37,14 @@ double pot_ext(double r, void *p);
 void add_pot_corr(double v[]);
 void fill_pot_unch(double v[], bool free);
 void add_pot_centr(double v[], int l);
-
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
 void normalize(int Nb, double psi[][Nb]);
 void add_density(int Nb, double n[], double psi[][Nb], int l);
-void solve_first_closed_shell(double E[2], double n[], double v[]);
+void solve_first_closed_shell(double E[2], double n[], double v[], bool free); // this is the only function specialized to the case N = 8 (is it true?)
 void density_integral(double n[]);
+void add_pot_exc(double v[], double n[]);
+void add_pot_coulomb(double v[], double n[]);
+double L_one_distance(double a[], double b[], int len);
 
 void print_func(double a[], double b[], int len, char name[25]);
 
@@ -61,7 +64,8 @@ int main(){
     L = 2.5 * R; // infrared cutoff. Space interval goes from 0 from L
     h = L / dim; // ultraviolet cutoff
    
-    printf("\nThe characteristic radius of the cluster is R = %lf\n",R);
+    printf("\n=============== SYSTEM PARAMETERS ===============\n");
+    printf("The characteristic radius of the cluster is R = %lf\n",R);
     printf("The infrared cutoff is L = %lf\n",L);
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
@@ -77,15 +81,43 @@ int main(){
 
     /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
     fill_pot_unch(v,free=true);
-    solve_first_closed_shell(E,n_free,v);
-    print_func(r,n_free,dim,"density.csv");
-    fprint_vec(stdout,E,2);
+    solve_first_closed_shell(E,n_free,v,free=true);
+    print_func(r,n_free,dim,"density_free.csv");
+    
+    printf("=============== FREE ELECTRONS ===============\n");
+    printf("The free energies are E_nl:\n");
+    printf("E_%d%d = %lf\n",0,0,E[0]);
+    printf("E_%d%d = %lf\n\n",0,1,E[1]);
+
     density_integral(n_free);
 
 
     /* Interacting electrons */
+    double n_old[dim], n[dim], v_step[dim];
+    double check;
+    copy_vec(n_free,n_old,dim);
+    fill_pot_unch(v,free=false);
+    int cnt = 0;
+    do{
+        copy_vec(v,v_step,dim);
+        add_pot_coulomb(v_step,n_old);
+        add_pot_exc(v_step,n_old);
+        copy_vec(n_old,n,dim);
+        solve_first_closed_shell(E,n,v_step,free=false);
+        check = L_one_distance(n,n_old,dim);
+        copy_vec(n,n_old,dim);
+        cnt++;
+    }while(check > EPS); 
 
+    // print density and final energies
+    printf("=============== INTERACTING ELECTRONS ===============\n");
+    printf("The convercence was reached in %d steps\n",cnt);
+    printf("The interacting energies are E_nl:\n");
+    printf("E_%d%d = %lf\n",0,0,E[0]);
+    printf("E_%d%d = %lf\n",0,1,E[1]);
     
+    print_func(r,n,dim,"density.csv");
+    density_integral(n);
 
 
 }
@@ -164,7 +196,6 @@ void add_pot_centr(double v[], int l){
     }
 }
 
-// routines
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]){
     // Diagonalize the SE with the finite difference method (i.e. using as a basis the position eigenstates),
     // finding the first Nb bound states of the potential in v[dim], and save the results in E[dim] and psi[dim][Nb]
@@ -230,7 +261,7 @@ void add_density(int Nb, double n[], double psi[][Nb], int l){
     }
 }
 
-void solve_first_closed_shell(double E[2], double n[], double v[]){
+void solve_first_closed_shell(double E[2], double n[], double v[], bool free){
     // diagonalize the SE for the 0s and 0p orbitals. Calculate the energies and fill the density array.
     double pot[dim];
     int l;
@@ -267,7 +298,37 @@ void density_integral(double n[]){
         tot += n[i] * r[i] * r[i];
     }
     tot *= 4.0 * M_PI * h;
-    printf("The intregral of the density is: N = %lf\n\n",tot);
+    printf("The integral of the density is: N = %lf\n\n",tot);
+}
+
+void add_pot_exc(double v[], double n[]){
+    // add the exchange potential to the array v[dim]
+    for(int i=0; i<dim; i++){
+        v[i] += -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
+    }
+}
+
+void add_pot_coulomb(double v[], double n[]){
+    // add the Coulomb potential to the array v[dim]
+    double K = 0.0;
+    for(int i=0; i<dim; i++){
+        K += r[i] * r[i] * n[i];
+    }
+    K *= 4.0 * M_PI * h;
+    for(int i=0; i<dim; i++){
+        v[i] += K / r[i];  
+    } 
+}
+
+double L_one_distance(double a[], double b[], int len){
+    // Calculate the (discretized version of the) L1 distance between a[len] and b[len] 
+    double dist = 0.0;
+    for(int i=0; i<len; i++){
+        dist += fabs(a[i]-b[i]);
+    }
+    dist *= h;
+    dist = sqrt(dist);
+    return dist;
 }
 
 // print functions

@@ -98,69 +98,69 @@ int main(){
     printf("\n");
 
 
-    // /* Interacting electrons */
-    // double n[dim];
-    // double E_new[4];
-    // fill_zero(E_new,4);
+    /* Interacting electrons */
+    double n[dim];
+    double E_new[4];
+    fill_zero(E_new,4);
 
-    // copy_vec(n_free,n,dim);
+    copy_vec(n_free,n,dim);
 
-    // double check, Vs[dim], Vp[dim], Vd[dim];
-    // partial_pot(Vs,r,dim,0,&par);
-    // partial_pot(Vp,r,dim,1,&par);
-    // partial_pot(Vd,r,dim,2,&par);
+    double check, Vs[dim], Vp[dim], Vd[dim];
+    partial_pot(Vs,r,dim,0,&par);
+    partial_pot(Vp,r,dim,1,&par);
+    partial_pot(Vd,r,dim,2,&par);
 
-    // double vs[dim], vp[dim], vd[dim];
+    double vs[dim], vp[dim], vd[dim];
 
-    // do{
+    do{
 
-    //     fill_zero(E,4);
-    //     fill_zero(eps,2);
-    //     cnt = 0;
+        fill_zero(E,4);
+        fill_zero(eps,2);
+        cnt = 0;
 
-    //     for(int l=0; l<3; l++){
-    //         if(l == 0){
-    //             Nb = 2;
-    //             double psi[dim][Nb];
-    //             copy_vec(Vs,vs,dim);
-    //             change_pot(vs,n,r,h,dim);
-    //             solve_radialSE_diagonalize(Nb,r,vs,eps,psi,h,dim);            
-    //             normalize(Nb,psi,h,dim);
-    //             add_density(Nb,r,n,psi,dim,l);
-    //             add_energy(&cnt,E,eps,Nb);
-    //             cnt += Nb;
+        for(int l=0; l<3; l++){
+            if(l == 0){
+                Nb = 2;
+                double psi[dim][Nb];
+                copy_vec(Vs,vs,dim);
+                change_pot(vs,n,r,h,dim);
+                solve_radialSE_diagonalize(Nb,r,vs,eps,psi,h,dim);            
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
 
-    //         }else if(l==1){
-    //             Nb = 1;
-    //             double psi[dim][Nb];
-    //             copy_vec(Vp,vp,dim);
-    //             change_pot(vp,n,r,h,dim);
-    //             solve_radialSE_diagonalize(Nb,r,vp,eps,psi,h,dim);
-    //             normalize(Nb,psi,h,dim);
-    //             add_density(Nb,r,n,psi,dim,l);
-    //             add_energy(&cnt,E,eps,Nb);
-    //             cnt += Nb;
+            }else if(l==1){
+                Nb = 1;
+                double psi[dim][Nb];
+                copy_vec(Vp,vp,dim);
+                change_pot(vp,n,r,h,dim);
+                solve_radialSE_diagonalize(Nb,r,vp,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
 
-    //         }else{
-    //             Nb = 1;
-    //             double psi[dim][Nb];
-    //             copy_vec(Vd,vd,dim);
-    //             change_pot(vd,n,r,h,dim);
-    //             solve_radialSE_diagonalize(Nb,r,vd,eps,psi,h,dim);
-    //             normalize(Nb,psi,h,dim);
-    //             add_density(Nb,r,n,psi,dim,l);
-    //             add_energy(&cnt,E,eps,Nb);
-    //             cnt += Nb;
+            }else{
+                Nb = 1;
+                double psi[dim][Nb];
+                copy_vec(Vd,vd,dim);
+                change_pot(vd,n,r,h,dim);
+                solve_radialSE_diagonalize(Nb,r,vd,eps,psi,h,dim);
+                normalize(Nb,psi,h,dim);
+                add_density(Nb,r,n,psi,dim,l);
+                add_energy(&cnt,E,eps,Nb);
+                cnt += Nb;
 
-    //         }
-    //     }
+            }
+        }
 
-    //     check = euclidean_distance(E_new,E,4);
-    //     copy_vec(E,E_new,4);
+        check = euclidean_distance(E_new,E,4);
+        copy_vec(E,E_new,4);
 
-    //     printf("dist = %lf\n",check);
+        printf("dist = %lf\n",check);
 
-    // }while(check > EPS);
+    }while(check > EPS);
 
 
 
