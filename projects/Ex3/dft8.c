@@ -39,7 +39,7 @@ void add_pot_centr(double v[], int l);
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
 void normalize(int Nb, double psi[][Nb]);
 void add_density(int Nb, double n[], double psi[][Nb], int l);
-void solve_first_closed_shell(double E[2], double n[], double v[], bool free); // this is the only function specialized to the case N = 8 (is it true?)
+void solve_first_closed_shell(double E[2], double n[], double v[], bool free); // this is the only function specialized to the case N = 8
 void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
@@ -113,7 +113,7 @@ int main(){
     // print density and final energies
     printf("=============== INTERACTING ELECTRONS ===============\n");
     printf("The convercence was reached in %d steps\n",cnt);
-    printf("The interacting energies are E_nl:\n");
+    printf("The interacting eigenvalues are E_nl:\n");
     printf("E_%d%d = %lf\n",0,0,E[0]);
     printf("E_%d%d = %lf\n",0,1,E[1]);
     
@@ -131,7 +131,6 @@ int main(){
 
 
 /* ======================= FUNCTION BODIES ======================= */
-// array functions
 void fill_zero(double a[], int len){
     // initialize all the elements of the vector to zero
     for(int i=0; i<len; i++){
@@ -187,7 +186,7 @@ void add_pot_corr(double v[]){
 }
 
 void fill_pot_unch(double v[], bool free){
-    // fill the vector v[dim] with the unchanged (or unchanging ? LoL) part of the potential
+    // fill the vector v[dim] with the unchanged part of the potential
     for(int i=0; i<dim; i++){
         v[i] = pot_ext(r[i],&par);
     }

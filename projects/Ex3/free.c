@@ -1,4 +1,4 @@
-/* ========================= ACTUALLY THIS IS THE NEW dft8.c ========================= */
+/* ========================= ACTUALLY THIS IS THE NEW dft20.c ========================= */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -18,9 +18,10 @@ typedef struct ParamEc{
 }ParamEc;
 
 /* ======================= GLOBAL VARIABLES ======================= */
-#define N 8 // number of electrons
+#define N 20 // number of electrons
 #define dim 500 // number of discretization points in the finite difference method
-#define EPS 1e-3
+#define EPS 1e-4 // precision for the convergence of the autoconsistent cycle
+#define BETA 1.0 // mixing procedure parameter
 
 double rs, R, rho;
 ParamPot par;
@@ -40,11 +41,13 @@ void add_pot_centr(double v[], int l);
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
 void normalize(int Nb, double psi[][Nb]);
 void add_density(int Nb, double n[], double psi[][Nb], int l);
-void solve_first_closed_shell(double E[2], double n[], double v[], bool free); // this is the only function specialized to the case N = 8 (is it true?)
+void solve_second_closed_shell(double E[4], double n[], double v[], bool free); // this is the only function specialized to the case N = 20
 void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
+double spillout(double n[]);
+void mixing_n(double n_old[], double n[]);
 
 void print_func(double a[], double b[], int len, char name[25]);
 
@@ -65,6 +68,7 @@ int main(){
     h = L / dim; // ultraviolet cutoff
    
     printf("\n=============== SYSTEM PARAMETERS ===============\n");
+    printf("Number of electrons: N = %d\n",N);
     printf("The characteristic radius of the cluster is R = %lf\n",R);
     printf("The infrared cutoff is L = %lf\n",L);
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
@@ -74,20 +78,22 @@ int main(){
 
     /* variables */
     double v[dim], n_free[dim];
-    double E[2];
+    double E[4];
 
     fill_position();
 
 
-    /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
+    /* Solving the SE for N = 20 non interacting electrons, in total we will have 4 orbitals (0s 0p 0d 1s) */
     fill_pot_unch(v,free=true);
-    solve_first_closed_shell(E,n_free,v,free=true);
+    solve_second_closed_shell(E,n_free,v,free=true);
     print_func(r,n_free,dim,"density_free.csv");
     
     printf("=============== FREE ELECTRONS ===============\n");
     printf("The free energies are E_nl:\n");
     printf("E_%d%d = %lf\n",0,0,E[0]);
-    printf("E_%d%d = %lf\n\n",0,1,E[1]);
+    printf("E_%d%d = %lf\n",1,0,E[1]);
+    printf("E_%d%d = %lf\n",0,1,E[2]);
+    printf("E_%d%d = %lf\n\n",0,2,E[3]);
 
     density_integral(n_free);
 
@@ -103,21 +109,36 @@ int main(){
         add_pot_coulomb(v_step,n_old);
         add_pot_exc(v_step,n_old);
         copy_vec(n_old,n,dim);
-        solve_first_closed_shell(E,n,v_step,free=false);
+        solve_second_closed_shell(E,n,v_step,free=false);
         check = L_one_distance(n,n_old,dim);
         copy_vec(n,n_old,dim);
+        //mixing_n(n_old,n);
         cnt++;
+        if(cnt == 5){
+            // print_func(r,n,dim,"density.csv");
+            // density_integral(n);
+            break;
+        }
+        printf("\rcnt = %d, check = %lf",cnt,check);
+        fflush(stdout);
     }while(check > EPS); 
 
     // print density and final energies
     printf("=============== INTERACTING ELECTRONS ===============\n");
     printf("The convercence was reached in %d steps\n",cnt);
-    printf("The interacting energies are E_nl:\n");
+    printf("The interacting eigenvalues are E_nl:\n");
     printf("E_%d%d = %lf\n",0,0,E[0]);
-    printf("E_%d%d = %lf\n",0,1,E[1]);
+    printf("E_%d%d = %lf\n",1,0,E[1]);
+    printf("E_%d%d = %lf\n",0,1,E[2]);
+    printf("E_%d%d = %lf\n\n",0,2,E[3]);
     
-    print_func(r,n,dim,"density.csv");
-    density_integral(n);
+    // print_func(r,n,dim,"density.csv");
+    // density_integral(n);
+
+
+    /* Calculate the spillout */
+    double deltaN = spillout(n);
+    printf("Spillout for N = 20: deltaN = %lf\n",deltaN);
     printf("\n");
 
 
@@ -181,7 +202,7 @@ void add_pot_corr(double v[]){
 }
 
 void fill_pot_unch(double v[], bool free){
-    // fill the vector v[dim] with the unchanged (or unchanging ? LoL) part of the potential
+    // fill the vector v[dim] with the unchanged part of the potential
     for(int i=0; i<dim; i++){
         v[i] = pot_ext(r[i],&par);
     }
@@ -262,33 +283,64 @@ void add_density(int Nb, double n[], double psi[][Nb], int l){
     }
 }
 
-void solve_first_closed_shell(double E[2], double n[], double v[], bool free){
-    // diagonalize the SE for the 0s and 0p orbitals. Calculate the energies and fill the density array.
+void solve_second_closed_shell(double E[4], double n[], double v[], bool free){
+    // diagonalize the SE for the (0s 0p 0d 1s) orbitals. Calculate the energies and fill the density array.
     double pot[dim];
     int l;
     
-    int Nb = 1;
-    double en[Nb], psi[dim][Nb];
+    int Nb;
+    double *en, **psi;
 
     fill_zero(n,dim);
 
-    // 0s
+    // 0s and 1s
     copy_vec(v,pot,dim);
-    l = 0; Nb = 1;
+    l = 0; Nb = 2;
+
+    en = malloc(Nb*sizeof(double));
+    psi = malloc(dim*sizeof(double *));
+    for(int i=0; i<dim; i++){
+        psi[i] = malloc(Nb*sizeof(psi[i]));
+    }
+
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
     normalize(Nb,psi);
     add_density(Nb,n,psi,l);
     E[0] = en[0];
+    E[1] = en[1];
 
     // 0p
     copy_vec(v,pot,dim);
     l = 1; Nb = 1;
+
+    en = malloc(Nb*sizeof(double));
+    psi = malloc(dim*sizeof(double *));
+    for(int i=0; i<dim; i++){
+        psi[i] = malloc(Nb*sizeof(psi[i]));
+    }
+
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
     normalize(Nb,psi);
     add_density(Nb,n,psi,l);
-    E[1] = en[0];
+    E[2] = en[0];
+
+    // 0d
+    copy_vec(v,pot,dim);
+    l = 2; Nb = 1;
+
+    en = malloc(Nb*sizeof(double));
+    psi = malloc(dim*sizeof(double *));
+    for(int i=0; i<dim; i++){
+        psi[i] = malloc(Nb*sizeof(psi[i]));
+    }
+
+    add_pot_centr(pot,l);
+    solve_radialSE_diagonalize(Nb,pot,en,psi);
+    normalize(Nb,psi);
+    add_density(Nb,n,psi,l);
+    E[3] = en[0];
    
 }
 
@@ -311,14 +363,31 @@ void add_pot_exc(double v[], double n[]){
 
 void add_pot_coulomb(double v[], double n[]){
     // add the Coulomb potential to the array v[dim]
-    double K = 0.0;
+    double K[dim];
+    
+    fill_zero(n,dim);
+    n[100] = 1/h;
+
+    print_func(r,n,dim,"density.csv");
+    density_integral(n);
+
+    fill_zero(K, dim);
     for(int i=0; i<dim; i++){
-        K += r[i] * r[i] * n[i];
+        for(int j=0; j<dim; j++){
+            if(r[j]<r[i]){
+                K[i] += r[j] * r[j] *n[j] / r[i];
+            }else{
+                K[i] += n[j] * r[j];
+            }
+        }
     }
-    K *= 4.0 * M_PI * h;
     for(int i=0; i<dim; i++){
-        v[i] += K / r[i];  
-    } 
+        K[i] *= 4.0 * M_PI * h;
+    }
+    print_func(r,K,dim,"data.csv");
+    for(int i=0; i<dim; i++){
+        v[i] += K[i];  
+    }
 }
 
 double L_one_distance(double a[], double b[], int len){
@@ -330,6 +399,25 @@ double L_one_distance(double a[], double b[], int len){
     dist *= h;
     dist = sqrt(dist);
     return dist;
+}
+
+double spillout(double n[]){
+    // Calculate the electronic spillout associated to the given density n[dim]
+    double ris = 0.0;
+    for(int i=0; i<dim; i++){
+        if(r[i]>R){
+            ris += r[i] * r[i] * n[i];
+        }
+    }
+    ris *= h * 4.0 * M_PI;
+    return ris;
+}
+
+void mixing_n(double n_old[], double n[]){
+    // Perform the mixing procedure
+    for(int i=0; i<dim; i++){
+        n_old[i] = BETA * n[i] + (1.0-BETA)*n_old[i];
+    }
 }
 
 // print functions
