@@ -3,6 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "lapack_wrappers.h"
 #include "print_routines.h"
@@ -19,8 +20,10 @@ typedef struct ParamEc{
 /* ======================= GLOBAL VARIABLES ======================= */
 #define N 8 // number of electrons
 #define dim 500 // number of discretization points in the finite difference method
-#define EPS 1e-3
+#define EPS 1e-4 // accuracy for the convergence of the autoconsistent cycle
+#define BETA 0.1 // mixing procedure parameter
 
+char atom[] = "Na"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
 double rs, R, rho;
 ParamPot par;
 
@@ -45,6 +48,7 @@ void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
 double spillout(double n[]);
+void mixing_n(double n_old[], double n[]);
 
 void print_func(double a[], double b[], int len, char name[25]);
 
@@ -52,7 +56,14 @@ void print_func(double a[], double b[], int len, char name[25]);
 int main(){
 
     /* system parameters */
-    rs = 3.93; // 3.93 for Na and 4.86 for K
+    if(!strcmp(atom,"Na")){
+        rs = 3.93;
+    }else if(!strcmp(atom,"K")){
+        rs = 4.86;
+    }else{
+        printf("\n\n\nERROR: Atom name wrong!\n\n\n");
+        return 0;
+    }
     R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
     rho = 3.0 / (4.0 * M_PI * rs * rs * rs); // density of the jellium
 
@@ -64,7 +75,8 @@ int main(){
     L = 2.5 * R; // infrared cutoff. Space interval goes from 0 from L
     h = L / dim; // ultraviolet cutoff
    
-    printf("\n=============== SYSTEM PARAMETERS ===============\n");
+    printf("\n\n=============== SYSTEM PARAMETERS ===============\n");
+    printf("Atom type: %s\n",atom);
     printf("Number of electrons: N = %d\n",N);
     printf("The characteristic radius of the cluster is R = %lf\n",R);
     printf("The infrared cutoff is L = %lf\n",L);
@@ -94,6 +106,7 @@ int main(){
 
 
     /* Interacting electrons */
+    printf("=============== INTERACTING ELECTRONS ===============\n");
     double n_old[dim], n[dim], v_step[dim];
     double check;
     copy_vec(n_free,n_old,dim);
@@ -106,13 +119,15 @@ int main(){
         copy_vec(n_old,n,dim);
         solve_first_closed_shell(E,n,v_step,free=false);
         check = L_one_distance(n,n_old,dim);
-        copy_vec(n,n_old,dim);
+        mixing_n(n_old,n);
         cnt++;
+        printf("\rinteration number %d \t convergence = %lf",cnt,check);
+        fflush(stdout);
     }while(check > EPS); 
+    printf("\n");
 
     // print density and final energies
-    printf("=============== INTERACTING ELECTRONS ===============\n");
-    printf("The convercence was reached in %d steps\n",cnt);
+    printf("\nThe convercence was reached in %d steps\n",cnt);
     printf("The interacting eigenvalues are E_nl:\n");
     printf("E_%d%d = %lf\n",0,0,E[0]);
     printf("E_%d%d = %lf\n",0,1,E[1]);
@@ -123,7 +138,7 @@ int main(){
 
     /* Calculate the spillout */
     double deltaN = spillout(n);
-    printf("Spillout for N = 8: deltaN = %lf\n",deltaN);
+    printf("Spillout for N = %d: deltaN = %lf\n",N,deltaN);
     printf("\n");
 
 
@@ -316,14 +331,23 @@ void add_pot_exc(double v[], double n[]){
 
 void add_pot_coulomb(double v[], double n[]){
     // add the Coulomb potential to the array v[dim]
-    double K = 0.0;
+    double K;
+
     for(int i=0; i<dim; i++){
-        K += r[i] * r[i] * n[i];
+        
+        K = 0.0;
+        for(int j=0; j<dim; j++){
+            if(r[i]>r[j]){
+                K += r[j] * r[j] * n[j] / r[i];
+            }else if(r[i]<r[j]){
+                K += r[j] * n[j];
+            }
+        }
+        K *= 4.0 * M_PI * h;
+        v[i] += K;
+
     }
-    K *= 4.0 * M_PI * h;
-    for(int i=0; i<dim; i++){
-        v[i] += K / r[i];  
-    } 
+
 }
 
 double L_one_distance(double a[], double b[], int len){
@@ -347,6 +371,13 @@ double spillout(double n[]){
     }
     ris *= h * 4.0 * M_PI;
     return ris;
+}
+
+void mixing_n(double n_old[], double n[]){
+    // Perform the mixing procedure
+    for(int i=0; i<dim; i++){
+        n_old[i] = BETA * n[i] + (1.0-BETA)*n_old[i];
+    }
 }
 
 // print functions

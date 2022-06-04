@@ -19,9 +19,9 @@ typedef struct ParamEc{
 
 /* ======================= GLOBAL VARIABLES ======================= */
 #define N 20 // number of electrons
-#define dim 500 // number of discretization points in the finite difference method
+#define dim 900 // number of discretization points in the finite difference method
 #define EPS 1e-4 // precision for the convergence of the autoconsistent cycle
-#define BETA 1.0 // mixing procedure parameter
+#define BETA 0.1 // mixing procedure parameter
 
 double rs, R, rho;
 ParamPot par;
@@ -111,14 +111,8 @@ int main(){
         copy_vec(n_old,n,dim);
         solve_second_closed_shell(E,n,v_step,free=false);
         check = L_one_distance(n,n_old,dim);
-        copy_vec(n,n_old,dim);
-        //mixing_n(n_old,n);
+        mixing_n(n_old,n);
         cnt++;
-        if(cnt == 5){
-            // print_func(r,n,dim,"density.csv");
-            // density_integral(n);
-            break;
-        }
         printf("\rcnt = %d, check = %lf",cnt,check);
         fflush(stdout);
     }while(check > EPS); 
@@ -132,8 +126,8 @@ int main(){
     printf("E_%d%d = %lf\n",0,1,E[2]);
     printf("E_%d%d = %lf\n\n",0,2,E[3]);
     
-    // print_func(r,n,dim,"density.csv");
-    // density_integral(n);
+    print_func(r,n,dim,"density.csv");
+    density_integral(n);
 
 
     /* Calculate the spillout */
@@ -363,31 +357,23 @@ void add_pot_exc(double v[], double n[]){
 
 void add_pot_coulomb(double v[], double n[]){
     // add the Coulomb potential to the array v[dim]
-    double K[dim];
-    
-    fill_zero(n,dim);
-    n[100] = 1/h;
+    double K;
 
-    print_func(r,n,dim,"density.csv");
-    density_integral(n);
-
-    fill_zero(K, dim);
     for(int i=0; i<dim; i++){
+        
+        K = 0.0;
         for(int j=0; j<dim; j++){
-            if(r[j]<r[i]){
-                K[i] += r[j] * r[j] *n[j] / r[i];
-            }else{
-                K[i] += n[j] * r[j];
+            if(r[i]>r[j]){
+                K += r[j] * r[j] * n[j] / r[i];
+            }else if(r[i]<r[j]){
+                K += r[j] * n[j];
             }
         }
+        K *= 4.0 * M_PI * h;
+        v[i] += K;
+
     }
-    for(int i=0; i<dim; i++){
-        K[i] *= 4.0 * M_PI * h;
-    }
-    print_func(r,K,dim,"data.csv");
-    for(int i=0; i<dim; i++){
-        v[i] += K[i];  
-    }
+
 }
 
 double L_one_distance(double a[], double b[], int len){

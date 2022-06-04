@@ -33,7 +33,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_8.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################################
-add_executable(dft20 dft20.c util.c)
+add_executable(dft20 dft20.c)
 
 target_compile_options(dft20 PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)
@@ -50,7 +50,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_20.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################################
-add_executable(dft40 dft40.c util.c)
+add_executable(dft40 dft40.c)
 
 target_compile_options(dft40 PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)

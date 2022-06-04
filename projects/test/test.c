@@ -1,61 +1,91 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "lapack_wrappers.h"
 #include "print_routines.h"
 
-/* =============== */
-typedef struct ParamPot{
-    double R, rho;
-}ParamPot;
+/* ======================= TYPEDEF ======================= */
 
-/* =============== */
-void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], double psi[][N], double h, int dim);
-double potential(double r, void *p);
-void fill_position(double r[], double h, int dim);
-void fill_potential(double r[], double v[], int l, int dim, void *p);
-void print_potential(double x[], double v[], int dim);
-void print_wf(int N, double r[], double psi[][N], int dim, double h);
-void normalize(int N, double psi[][N], double h, int dim);
+/* ======================= GLOBAL VARIABLES ======================= */
+#define dim 500 // discretization
 
-/* =============== */
+double L,h;
+double r[dim];
+
+/* ======================= FUNCTION HEADERS ======================= */
+double pot(double r);
+void fill_position();
+void fill_potential(double v[]);
+void add_centr(double v[], int l);
+void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
+void print_func(double a[], double b[], int len, char name[25]);
+void print_wf(int Nb, double psi[][Nb], char name[25]);
+
+/* ======================= MAIN ======================= */
 int main(){
- 
+
     /* parameters */
-    int N = 20; // number of electrons
-    double rs = 3.93; // 3.93 for Na and 4.86 for K
+    L = 8.0; // infrared cutoff
+    h = (L/dim); // ultraviolet cutoff
 
-    double R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
-    double rho = 3.0 / (4.0 * M_PI * rs * rs * rs); // density of the jellium
+    printf("\nThe infrared cutoff is L = %lf\n",L);
+    printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
-    ParamPot par = {R,rho};
 
-    double L = 3.0 * R; // infrared cutoff
-    int dim = 950;
-    double h = L / dim; // ultraviolet cutoff
+    /* variables */
+    int Nb = 4;
+    double E[Nb];
+    double v[dim], psi[dim][Nb];
 
-    printf("\nThe ultraviolet cutoff is h=%lf\n",h);
-    printf("R=%lf\n",R);
-    printf("L=%lf\n\n",L);
+    fill_position();
+    fill_potential(v);
+    
+    int l = 0;
+    add_centr(v,l);
 
-    /* Solving the SE for the non interacting electrons, in total we will have 4 orbitals (0s 0p 0d 1s) */
-    int l = 2;
-    int Nb = 1;
-    double r[dim], E[Nb], psi[dim][Nb],v[dim];
+    solve_radialSE_diagonalize(Nb,v,E,psi);
 
-    fill_position(r,h,dim);
-    fill_potential(r,v,l,dim,&par);
+    printf("\nThe energies E_ln are:\n");
+    printf("E_%d%d = %lf\n",0,0,E[0]);
+    printf("E_%d%d = %lf\n",0,1,E[1]);
+    printf("E_%d%d = %lf\n",0,2,E[2]);
+    printf("E_%d%d = %lf\n",0,3,E[3]);
+    printf("\n");  
 
-    solve_radialSE_diagonalize(Nb,r,v,E,psi,h,dim);    
-    normalize(Nb,psi,h,dim);
-    print_wf(Nb,r,psi,dim,h);
+    print_wf(Nb,psi,"data.csv");    
 
-   
 }
 
-/* =============== */
-void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], double psi[][N], double h, int dim){
+
+/* ======================= FUNCTION BODIES ======================= */
+double pot(double r){
+    return 0.5 * r * r;
+}
+
+void fill_position(){
+    for(int i=0; i<dim; i++){
+        r[i] = h * (i+1);
+    }
+}
+
+void fill_potential(double v[]){
+    for(int i=0; i<dim; i++){
+        v[i] = pot(r[i]);
+    }
+}
+
+void add_centr(double v[], int l){
+    for(int i=0; i<dim; i++){
+        v[i] += (double)l*(l+1)/(2.0*r[i]*r[i]);
+    }
+}
+
+void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]){
+    // Diagonalize the SE with the finite difference method (i.e. using as a basis the position eigenstates),
+    // finding the first Nb bound states of the potential in v[dim], and save the results in E[dim] and psi[dim][Nb]
 
     /* diagonal */
     double d[dim];
@@ -77,64 +107,29 @@ void solve_radialSE_diagonalize(int N, double r[], double v[], double E[], doubl
     assert(info == 0);
 
     /* save results */
-    for(int i=0; i<N; i++){
+    for(int i=0; i<Nb; i++){
         E[i] = eigval[i];
         for(int j=0; j<dim; j++){
-            psi[j][i] = -eigvec[i][j];
+            psi[j][i] = -eigvec[i][j] / r[j];   // in this way it return the R(r)
         }
     }
 
 }
 
-double potential(double r, void *p){
-
-    ParamPot *par = (ParamPot*)p;
-    double R = par->R;
-    double rho = par->rho;
-
-    double pot;
-    if(r <= R){
-        pot = r * r / 3.0 - R * R;
-    }else{
-        pot = -2.0/3.0 * R * R * R / r; 
-    }
-
-    pot *= 2.0 * M_PI * rho;
-    return pot;
-
-}
-
-void fill_position(double r[], double h, int dim){
-    
-    for(int i=0; i<dim; i++){
-        r[i] = h * (i+1);
-    }
-    
-}
-
-void fill_potential(double r[], double v[], int l, int dim, void *p){
-        
-    for(int i=0; i<dim; i++){
-        v[i] = potential(r[i],p) + (double)l*(l+1)/(2.0*r[i]*r[i]);
-    }
-}
-
-void print_potential(double x[], double v[], int dim){
-
+void print_func(double a[], double b[], int len, char name[25]){
+    // no input control
+    // Print on file the two array
     FILE *file;
-    file = fopen("potential.csv","w");
-    fprint_two_vec(file,x,v,dim);
+    file = fopen(name,"w");
+    fprint_two_vec(file,a,b,len);
     fclose(file);
-
 }
 
-void print_wf(int N, double r[], double psi[][N], int dim, double h){
-    
+void print_wf(int Nb, double psi[][Nb], char name[25]){
     FILE *file;
-    file = fopen("wf.csv","w");
-    
+    file = fopen(name,"w");
     for(int i=0; i<dim; i++){
-        for(int j=0; j<N+1; j++){
+        for(int j=0; j<Nb+1; j++){
             if(j==0){
                 fprint_double(file,r[i]);
             }else{
@@ -143,33 +138,5 @@ void print_wf(int N, double r[], double psi[][N], int dim, double h){
         }
         fprintf(file,"\n");
     }
-
     fclose(file);
-
-}
-
-
-void normalize(int N, double psi[][N], double h, int dim){
-    
-    /* calculate norm */
-    double norm[N];
-    for(int i=0; i<N; i++){
-        norm[i] = 0.0;
-    }
-    
-    for(int i=0; i<N;i++){
-        for(int j=0; j<dim; j++){
-            norm[i] += psi[j][i] * psi[j][i];
-        }
-        norm[i] *= h;
-        norm[i] = sqrt(norm[i]);
-    }
-
-    /* normalize */
-    for(int i=0; i<N; i++){
-        for(int j=0; j<dim; j++){
-            psi[j][i] /= norm[i];
-        }
-    }
-    
 }
