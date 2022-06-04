@@ -1,13 +1,10 @@
 set datafile separator '\t'
 set term qt 0
 
-set xrange [0.0:15]
-
-plot 's.csv' using 1:2 w lines title "0s" ,\
-     'p.csv' using 1:2 w lines title "0p"
-
+set title "Free electronic density for N = 8"
+plot "density_free.csv" using 1:2 w lines notitle
 pause -1
-    
-plot 'density_free.csv' using 1:2 w lines title "electron density"
 
+set title "Interacting electronic density of N = 8"
+plot "density.csv" using 1:2 w lines notitle
 pause -1

@@ -16,7 +16,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_free.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################################
-add_executable(dft8 dft8.c util.c)
+add_executable(dft8 dft8.c)
 
 target_compile_options(dft8 PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)
