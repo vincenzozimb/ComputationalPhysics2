@@ -132,7 +132,7 @@ int main(){
     printf("E_%d%d = %lf\n",0,0,E[0]);
     printf("E_%d%d = %lf\n",0,1,E[1]);
     
-    print_func(r,n,dim,"density.csv");
+    print_func(r,n,dim,"density8.csv");
     density_integral(n);
 
 
