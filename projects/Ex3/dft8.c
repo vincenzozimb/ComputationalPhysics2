@@ -325,7 +325,8 @@ void density_integral(double n[]){
 void add_pot_exc(double v[], double n[]){
     // add the exchange potential to the array v[dim]
     for(int i=0; i<dim; i++){
-        v[i] += -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
+        v[i] += -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0); 
+        v[i] += -1.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
     }
 }
 

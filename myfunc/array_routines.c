@@ -1,7 +1,8 @@
 #include "array_routines.h"
 
 #include <assert.h>
-#include <cblas.h>
+//#include <cblas.h>
+#pragma comment(lib, "libcblas.lib")
 #include <complex.h>
 #include <math.h>
 #include <stdio.h>

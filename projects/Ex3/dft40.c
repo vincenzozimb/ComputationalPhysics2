@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include <assert.h>
 #include <stdbool.h>
 
@@ -55,14 +56,15 @@ void print_func(double a[], double b[], int len, char name[25]);
 int main(){
 
     /* system parameters */
-    if(!strcmp(atom,"Na")){
-        rs = 3.93;
-    }else if(!strcmp(atom,"K")){
-        rs = 4.86;
-    }else{
-        printf("\n\n\nERROR: Atom name wrong!\n\n\n");
-        return 0;
-    }
+    // if(!strcmp(atom,"Na")){
+    //     rs = 3.93;
+    // }else if(!strcmp(atom,"K")){
+    //     rs = 4.86;
+    // }else{
+    //     printf("\n\n\nERROR: Atom name wrong!\n\n\n");
+    //     return 0;
+    // }
+    rs=3.93;
     R = rs * pow((double)N,1.0/3.0); // radius of the cluster (of its harmonic part)
     rho = 3.0 / (4.0 * M_PI * rs * rs * rs); // density of the jellium
 
@@ -290,25 +292,21 @@ void add_density(int Nb, double n[], double psi[][Nb], int l){
     }
 }
 
-void solve_third_closed_shell(double E[6], double n[], double v[], bool free){
+void solve_third_closed_shell(double E[6], double n[], double v[], bool free_el){
     // diagonalize the SE for the (0s 0p 0d 1s) orbitals. Calculate the energies and fill the density array.
     double pot[dim];
     int l;
     
     int Nb;
-    double *en, **psi;
+    double *en;
 
     fill_zero(n,dim);
 
     // 0s and 1s
     copy_vec(v,pot,dim);
     l = 0; Nb = 2;
-
+    double psi[dim][Nb];
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -322,10 +320,9 @@ void solve_third_closed_shell(double E[6], double n[], double v[], bool free){
     l = 1; Nb = 2;
 
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
+    double newArrayp[dim][Nb];
+
+    memcpy(psi, newArrayp, sizeof(psi));
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -337,12 +334,10 @@ void solve_third_closed_shell(double E[6], double n[], double v[], bool free){
     // 0d
     copy_vec(v,pot,dim);
     l = 2; Nb = 1;
+    double newArray0d[dim][Nb];
+    memcpy(psi, newArray0d, sizeof(psi));
 
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -350,15 +345,13 @@ void solve_third_closed_shell(double E[6], double n[], double v[], bool free){
     add_density(Nb,n,psi,l);
     E[4] = en[0];
         
-    // 0d
+    // 0f
     copy_vec(v,pot,dim);
     l = 3; Nb = 1;
 
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
+    double newArray0f[dim][Nb];
+    memcpy(psi, newArray0f, sizeof(psi));
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -382,6 +375,7 @@ void add_pot_exc(double v[], double n[]){
     // add the exchange potential to the array v[dim]
     for(int i=0; i<dim; i++){
         v[i] += -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
+        v[i] += -1.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
     }
 }
 
