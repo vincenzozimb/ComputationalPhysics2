@@ -46,7 +46,7 @@ void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
-double spillout(double n[]);
+double cluster_pol(double n[]);
 void mixing_n(double n_old[], double n[]);
 
 void print_func(double a[], double b[], int len, char name[25]);
@@ -139,9 +139,9 @@ int main(){
     density_integral(n);
 
 
-    /* Calculate the spillout */
-    double deltaN = spillout(n);
-    printf("Spillout for N = %d: deltaN = %lf\n",N,deltaN);
+    /* Calculate the cluster polarizability */
+    double alpha = cluster_pol(n);
+    printf("Cluster polarizability for N = %d: alpha = %lf\n",N,alpha);
     printf("\n");
 
 
@@ -149,7 +149,6 @@ int main(){
 
 
 /* ======================= FUNCTION BODIES ======================= */
-// array functions
 void fill_zero(double a[], int len){
     // initialize all the elements of the vector to zero
     for(int i=0; i<len; i++){
@@ -292,19 +291,15 @@ void solve_second_closed_shell(double E[4], double n[], double v[]){
     int l;
     
     int Nb;
-    double *en, **psi;
+    double *en;
 
     fill_zero(n,dim);
 
     // 0s and 1s
     copy_vec(v,pot,dim);
     l = 0; Nb = 2;
-
+    double psi[dim][Nb];
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -316,12 +311,11 @@ void solve_second_closed_shell(double E[4], double n[], double v[]){
     // 0p
     copy_vec(v,pot,dim);
     l = 1; Nb = 1;
-
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
+
+    double newArray[dim][Nb];
+
+    memcpy(psi, newArray, sizeof(psi));
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -333,18 +327,16 @@ void solve_second_closed_shell(double E[4], double n[], double v[]){
     copy_vec(v,pot,dim);
     l = 2; Nb = 1;
 
+    double newArray2[dim][Nb];
+    memcpy(psi, newArray2, sizeof(psi));
     en = malloc(Nb*sizeof(double));
-    psi = malloc(dim*sizeof(double *));
-    for(int i=0; i<dim; i++){
-        psi[i] = malloc(Nb*sizeof(psi[i]));
-    }
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
     normalize(Nb,psi);
     add_density(Nb,n,psi,l);
     E[3] = en[0];
-   
+ 
 }
 
 void density_integral(double n[]){
@@ -397,8 +389,8 @@ double L_one_distance(double a[], double b[], int len){
     return dist;
 }
 
-double spillout(double n[]){
-    // Calculate the electronic spillout associated to the given density n[dim]
+double cluster_pol(double n[]){
+    // Calculate the electronic spillout associated to the given density n[dim] and the associated cluster polarizability
     double ris = 0.0;
     for(int i=0; i<dim; i++){
         if(r[i]>R){
@@ -406,7 +398,8 @@ double spillout(double n[]){
         }
     }
     ris *= h * 4.0 * M_PI;
-    return ris;
+    // return cluster polarizability
+    return pow(R,3.0) * (1.0 + ris/N);
 }
 
 void mixing_n(double n_old[], double n[]){

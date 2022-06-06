@@ -47,7 +47,7 @@ void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
-double spillout(double n[]);
+double cluster_pol(double n[]);
 void mixing_n(double n_old[], double n[]);
 
 void print_func(double a[], double b[], int len, char name[25]);
@@ -136,9 +136,9 @@ int main(){
     density_integral(n);
 
 
-    /* Calculate the spillout */
-    double deltaN = spillout(n);
-    printf("Spillout for N = %d: deltaN = %lf\n",N,deltaN);
+    /* Calculate the cluster polarizability */
+    double alpha = cluster_pol(n);
+    printf("Cluster polarizability for N = %d: alpha = %lf\n",N,alpha);
     printf("\n");
 
 
@@ -362,8 +362,8 @@ double L_one_distance(double a[], double b[], int len){
     return dist;
 }
 
-double spillout(double n[]){
-    // Calculate the electronic spillout associated to the given density n[dim]
+double cluster_pol(double n[]){
+    // Calculate the electronic spillout associated to the given density n[dim] and the associated cluster polarizability
     double ris = 0.0;
     for(int i=0; i<dim; i++){
         if(r[i]>R){
@@ -371,7 +371,8 @@ double spillout(double n[]){
         }
     }
     ris *= h * 4.0 * M_PI;
-    return ris;
+    // return cluster polarizability
+    return pow(R,3.0) * (1.0 + ris/N);
 }
 
 void mixing_n(double n_old[], double n[]){
