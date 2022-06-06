@@ -37,12 +37,12 @@ void copy_vec(double copy[], double paste[], int len);
 void fill_position();
 double pot_ext(double r, void *p);
 void add_pot_corr(double v[]);
-void fill_pot_unch(double v[], bool free);
+void fill_pot_unch(double v[], bool free_e);
 void add_pot_centr(double v[], int l);
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
 void normalize(int Nb, double psi[][Nb]);
 void add_density(int Nb, double n[], double psi[][Nb], int l);
-void solve_first_closed_shell(double E[2], double n[], double v[], bool free); // this is the only function specialized to the case N = 8
+void solve_first_closed_shell(double E[2], double n[], double v[]); // this is the only function specialized to the case N = 8
 void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
@@ -82,7 +82,7 @@ int main(){
     printf("The infrared cutoff is L = %lf\n",L);
     printf("The ultraviolet cutoff is h = %lf\n\n",h);
 
-    bool free;
+    bool free_e;
 
 
     /* variables */
@@ -93,8 +93,8 @@ int main(){
 
 
     /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
-    fill_pot_unch(v,free=true);
-    solve_first_closed_shell(E,n_free,v,free=true);
+    fill_pot_unch(v,free_e=true);
+    solve_first_closed_shell(E,n_free,v);
     print_func(r,n_free,dim,"density_free.csv");
     
     printf("=============== FREE ELECTRONS ===============\n");
@@ -110,14 +110,14 @@ int main(){
     double n_old[dim], n[dim], v_step[dim];
     double check;
     copy_vec(n_free,n_old,dim);
-    fill_pot_unch(v,free=false);
+    fill_pot_unch(v,free_e=false);
     int cnt = 0;
     do{
         copy_vec(v,v_step,dim);
         add_pot_coulomb(v_step,n_old);
         add_pot_exc(v_step,n_old);
         copy_vec(n_old,n,dim);
-        solve_first_closed_shell(E,n,v_step,free=false);
+        solve_first_closed_shell(E,n,v_step);
         check = L_one_distance(n,n_old,dim);
         mixing_n(n_old,n);
         cnt++;
@@ -200,12 +200,12 @@ void add_pot_corr(double v[]){
     }
 }
 
-void fill_pot_unch(double v[], bool free){
+void fill_pot_unch(double v[], bool free_e){
     // fill the vector v[dim] with the unchanged part of the potential
     for(int i=0; i<dim; i++){
         v[i] = pot_ext(r[i],&par);
     }
-    if(!free){
+    if(!free_e){
         add_pot_corr(v);
     }
 }
@@ -282,7 +282,7 @@ void add_density(int Nb, double n[], double psi[][Nb], int l){
     }
 }
 
-void solve_first_closed_shell(double E[2], double n[], double v[], bool free){
+void solve_first_closed_shell(double E[2], double n[], double v[]){
     // diagonalize the SE for the 0s and 0p orbitals. Calculate the energies and fill the density array.
     double pot[dim];
     int l;
@@ -326,6 +326,7 @@ void add_pot_exc(double v[], double n[]){
     // add the exchange potential to the array v[dim]
     for(int i=0; i<dim; i++){
         v[i] += -3.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
+        v[i] += -1.0/4.0 * pow(3.0/M_PI,1.0/3.0) * pow(n[i],1.0/3.0);
     }
 }
 
