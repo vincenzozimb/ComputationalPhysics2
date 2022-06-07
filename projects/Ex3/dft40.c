@@ -23,7 +23,7 @@ typedef struct ParamEc{
 #define EPS 1e-4 // precision for the convergence of the autoconsistent cycle
 #define BETA 0.1 // mixing procedure parameter
 
-char atom[] = "Na"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
+char atom[] = "K"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
 double rs, R, rho;
 ParamPot par;
 
@@ -47,7 +47,7 @@ void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
-double cluster_pol(double n[]);
+void cluster_pol(double n[]);
 void mixing_n(double n_old[], double n[]);
 
 void print_func(double a[], double b[], int len, char name[25]);
@@ -95,7 +95,7 @@ int main(){
     /* Solving the SE for N = 40 non interacting electrons, in total we will have 4 orbitals (0s 1s 0p 1p 0d 0f) */
     fill_pot_unch(v,free_e=true);
     solve_third_closed_shell(E,n_free,v);
-    print_func(r,n_free,dim,"density_free.csv");
+    print_func(r,n_free,dim,"density_free40.csv");
     
     printf("=============== FREE ELECTRONS ===============\n");
     printf("The free energies are E_nl:\n");
@@ -145,10 +145,8 @@ int main(){
 
 
     /* Calculate the cluster polarizability */
-    double alpha = cluster_pol(n);
-    printf("Cluster polarizability for N = %d: alpha = %lf\n",N,alpha);
+    cluster_pol(n);
     printf("\n");
-
 
 }
 
@@ -320,7 +318,7 @@ void solve_third_closed_shell(double E[6], double n[], double v[]){
     en = malloc(Nb*sizeof(double));
     double newArrayp[dim][Nb];
 
-    memcpy(psi, newArrayp, sizeof(psi));
+    memcpy(psi, newArrayp, sizeof(newArrayp));
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -333,7 +331,7 @@ void solve_third_closed_shell(double E[6], double n[], double v[]){
     copy_vec(v,pot,dim);
     l = 2; Nb = 1;
     double newArray0d[dim][Nb];
-    memcpy(psi, newArray0d, sizeof(psi));
+    memcpy(psi, newArray0d, sizeof(newArray0d));
 
     en = malloc(Nb*sizeof(double));
 
@@ -349,7 +347,7 @@ void solve_third_closed_shell(double E[6], double n[], double v[]){
 
     en = malloc(Nb*sizeof(double));
     double newArray0f[dim][Nb];
-    memcpy(psi, newArray0f, sizeof(psi));
+    memcpy(psi, newArray0f, sizeof(newArray0f));
 
     add_pot_centr(pot,l);
     solve_radialSE_diagonalize(Nb,pot,en,psi);
@@ -409,7 +407,7 @@ double L_one_distance(double a[], double b[], int len){
     return dist;
 }
 
-double cluster_pol(double n[]){
+void cluster_pol(double n[]){
     // Calculate the electronic spillout associated to the given density n[dim] and the associated cluster polarizability
     double ris = 0.0;
     for(int i=0; i<dim; i++){
@@ -418,8 +416,9 @@ double cluster_pol(double n[]){
         }
     }
     ris *= h * 4.0 * M_PI;
-    // return cluster polarizability
-    return pow(R,3.0) * (1.0 + ris/N);
+    printf("Electronic spillout for N = %d: alpha = %lf\n",N,ris);
+    ris =  pow(R,3.0) * (1.0 + ris/N);
+    printf("Cluster polarizability for N = %d: alpha = %lf\n",N,ris);
 }
 
 void mixing_n(double n_old[], double n[]){
