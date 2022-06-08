@@ -23,7 +23,7 @@ typedef struct ParamEc{
 #define EPS 1e-4 // precision for the convergence of the autoconsistent cycle
 #define BETA 0.1 // mixing procedure parameter
 
-char atom[] = "K"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
+char atom[] = "Na"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
 double rs, R, rho;
 ParamPot par;
 
@@ -49,6 +49,7 @@ void add_pot_coulomb(double v[], double n[]);
 double L_one_distance(double a[], double b[], int len);
 void cluster_pol(double n[]);
 void mixing_n(double n_old[], double n[]);
+double energyGS(double n[], double E[6]);
 
 void print_func(double a[], double b[], int len, char name[25]);
 
@@ -146,6 +147,11 @@ int main(){
 
     /* Calculate the cluster polarizability */
     cluster_pol(n);
+    
+
+    /* calculate the ground state energy */
+    double E_gs = energyGS(n,E);
+    printf("The ground state energy for N = %d is: E_0 = %lf\n",N,E_gs);
     printf("\n");
 
 }
@@ -428,6 +434,35 @@ void mixing_n(double n_old[], double n[]){
     }
 }
 
+double energyGS(double n[], double E[6]){
+    // Calculate the ground state energy
+    
+    double coulomb[dim];
+    fill_zero(coulomb,dim);
+    add_pot_coulomb(coulomb,n);
+    double cou = 0.0;
+    for(int i=0; i<dim; i++){
+        cou += r[i] * r[i] * n[i] * coulomb[i];
+    } 
+    cou *= -2.0 * M_PI * h;
+    
+    double ex = 0.0;
+    for(int i=0; i<dim; i++){
+        ex += r[i] * r[i] * pow(n[i],4.0/3.0);
+    }
+    ex *= h * M_PI * pow(3.0/M_PI,1.0/3.0);
+
+    double sum_eig = 0.0;
+    sum_eig += 2.0 * E[0];
+    sum_eig += 2.0 * E[1];
+    sum_eig += 2.0 * 3.0 * E[2];
+    sum_eig += 2.0 * 3.0 * E[3];
+    sum_eig += 2.0 * 5.0 * E[4];
+    sum_eig += 2.0 * 7.0 * E[5];
+
+    return sum_eig + cou + ex;
+
+}
 // print functions
 void print_func(double a[], double b[], int len, char name[25]){
     // no input control
