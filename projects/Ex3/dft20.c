@@ -3,6 +3,7 @@
 #include <math.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "lapack_wrappers.h"
 #include "print_routines.h"

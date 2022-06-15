@@ -1,11 +1,10 @@
 #include "array_routines.h"
 
 #include <assert.h>
-#include <cblas.h>
+#pragma comment(lib,"libciblas.lib")
 #include <complex.h>
 #include <math.h>
 #include <stdio.h>
-
 
 void mat_copy(int nrows, int ncols, const double *src, double *dest) {
 	assert(nrows >= 0 && ncols >= 0);
