@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmyfunc.a CMakeFiles/myfunc.dir/print_routines.c.o CMakeFiles/myfunc.dir/numerov.c.o CMakeFiles/myfunc.dir/bisection.c.o CMakeFiles/myfunc.dir/zeros_newton.c.o CMakeFiles/myfunc.dir/integrate_trap.c.o CMakeFiles/myfunc.dir/bessel_func.c.o CMakeFiles/myfunc.dir/array_routines.c.o CMakeFiles/myfunc.dir/lapack_wrappers.c.o
+/usr/bin/ranlib libmyfunc.a
