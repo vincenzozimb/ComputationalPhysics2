@@ -7,5 +7,8 @@ af9d1f7e335c0a35a86395da40f2beae projects/Ex1/CMakeFiles/run-ex1-scatt
 f2a138ea9cc1c04f975c4852c6e70327 projects/Ex3/CMakeFiles/run-ex3-20
 9ddd88e56af408792f4816dced94647a projects/Ex3/CMakeFiles/run-ex3-40
 cc59de2e8764058a47af3c6d0614d736 projects/Ex3/CMakeFiles/run-ex3-8
-46b92a7b24711355c178de950805029d projects/Ex4/CMakeFiles/run-ex4-vmc
+a9df52bfd3b1c15748437ce5aa2f354b projects/Ex4/CMakeFiles/run-ex4-mc1d
+63eac4cd280c29e589dcfbcc59a253c3 projects/Ex4/CMakeFiles/run-ex4-mc3d
+2879f9ea95dc93ded9942edc506f0eee projects/Ex4/CMakeFiles/run-ex4-mcel
+8988dbb26f84382285c2d3e763fe4e54 projects/Ex4/CMakeFiles/run-ex4-test1
 518ce2f7b384f42b605833d12a973cb1 projects/test/CMakeFiles/run-test

@@ -32,7 +32,7 @@
 					"source" : "myfunc",
 					"targetIndexes" : 
 					[
-						6
+						9
 					]
 				},
 				{
@@ -46,8 +46,8 @@
 					"source" : "projects/test",
 					"targetIndexes" : 
 					[
-						16,
-						18
+						22,
+						24
 					]
 				},
 				{
@@ -64,11 +64,11 @@
 						0,
 						1,
 						2,
-						8,
-						9,
-						10,
 						11,
-						17
+						12,
+						13,
+						14,
+						23
 					]
 				},
 				{
@@ -85,10 +85,10 @@
 						3,
 						4,
 						5,
-						7,
-						12,
-						13,
-						14
+						10,
+						15,
+						16,
+						17
 					]
 				},
 				{
@@ -102,8 +102,14 @@
 					"source" : "projects/Ex4",
 					"targetIndexes" : 
 					[
-						15,
-						19
+						6,
+						7,
+						8,
+						18,
+						19,
+						20,
+						21,
+						25
 					]
 				}
 			],
@@ -142,7 +148,13 @@
 						16,
 						17,
 						18,
-						19
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25
 					]
 				}
 			],
@@ -188,6 +200,27 @@
 					"id" : "dft8::@22a39aa393c178065d48",
 					"jsonFile" : "target-dft8-Debug-a547d7e3236f06a20240.json",
 					"name" : "dft8",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "mc1d::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-mc1d-Debug-248bd6fa2db6709a789b.json",
+					"name" : "mc1d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "mc3d::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-mc3d-Debug-539ba1bb037042d6c219.json",
+					"name" : "mc3d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "mcel::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-mcel-Debug-a3c8e7dc3de99e13b7c9.json",
+					"name" : "mcel",
 					"projectIndex" : 0
 				},
 				{
@@ -255,9 +288,30 @@
 				},
 				{
 					"directoryIndex" : 5,
-					"id" : "run-ex4-vmc::@24dfdae87deb5d0085b7",
-					"jsonFile" : "target-run-ex4-vmc-Debug-935cf9517b2a3de8c1ea.json",
-					"name" : "run-ex4-vmc",
+					"id" : "run-ex4-mc1d::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-run-ex4-mc1d-Debug-b854f4b3ba921d923472.json",
+					"name" : "run-ex4-mc1d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "run-ex4-mc3d::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-run-ex4-mc3d-Debug-7d4d9a9f990d7b4dfcec.json",
+					"name" : "run-ex4-mc3d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "run-ex4-mcel::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-run-ex4-mcel-Debug-09eb1593d8ec5c3d7fa1.json",
+					"name" : "run-ex4-mcel",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "run-ex4-test1::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-run-ex4-test1-Debug-95e8be77effec6fc7826.json",
+					"name" : "run-ex4-test1",
 					"projectIndex" : 0
 				},
 				{
@@ -283,9 +337,9 @@
 				},
 				{
 					"directoryIndex" : 5,
-					"id" : "vmc::@24dfdae87deb5d0085b7",
-					"jsonFile" : "target-vmc-Debug-c7c5d2425c3cefc44543.json",
-					"name" : "vmc",
+					"id" : "test1::@24dfdae87deb5d0085b7",
+					"jsonFile" : "target-test1-Debug-d162c39652a8e969ab41.json",
+					"name" : "test1",
 					"projectIndex" : 0
 				}
 			]

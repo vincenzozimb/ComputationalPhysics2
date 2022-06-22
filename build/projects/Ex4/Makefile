@@ -65,16 +65,6 @@ CMAKE_BINARY_DIR = /Users/teresa/Desktop/Repositories/ComputationalPhysics2/buil
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/opt/homebrew/Cellar/cmake/3.20.1/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -84,6 +74,16 @@ edit_cache:
 # Special rule for the target edit_cache
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/opt/homebrew/Cellar/cmake/3.20.1/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -117,80 +117,212 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-projects/Ex4/CMakeFiles/run-ex4-vmc.dir/rule:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-vmc.dir/rule
-.PHONY : projects/Ex4/CMakeFiles/run-ex4-vmc.dir/rule
+projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
 
 # Convenience name for target.
-run-ex4-vmc: projects/Ex4/CMakeFiles/run-ex4-vmc.dir/rule
-.PHONY : run-ex4-vmc
+run-ex4-test1: projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
+.PHONY : run-ex4-test1
 
 # fast build rule for target.
-run-ex4-vmc/fast:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-vmc.dir/build.make projects/Ex4/CMakeFiles/run-ex4-vmc.dir/build
-.PHONY : run-ex4-vmc/fast
+run-ex4-test1/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/build
+.PHONY : run-ex4-test1/fast
 
 # Convenience name for target.
-projects/Ex4/CMakeFiles/vmc.dir/rule:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/vmc.dir/rule
-.PHONY : projects/Ex4/CMakeFiles/vmc.dir/rule
+projects/Ex4/CMakeFiles/test1.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/test1.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/test1.dir/rule
 
 # Convenience name for target.
-vmc: projects/Ex4/CMakeFiles/vmc.dir/rule
-.PHONY : vmc
+test1: projects/Ex4/CMakeFiles/test1.dir/rule
+.PHONY : test1
 
 # fast build rule for target.
-vmc/fast:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/build
-.PHONY : vmc/fast
+test1/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/build
+.PHONY : test1/fast
 
-util.o: util.c.o
-.PHONY : util.o
+# Convenience name for target.
+projects/Ex4/CMakeFiles/mcel.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/mcel.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/mcel.dir/rule
+
+# Convenience name for target.
+mcel: projects/Ex4/CMakeFiles/mcel.dir/rule
+.PHONY : mcel
+
+# fast build rule for target.
+mcel/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/build
+.PHONY : mcel/fast
+
+# Convenience name for target.
+projects/Ex4/CMakeFiles/mc1d.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/mc1d.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/mc1d.dir/rule
+
+# Convenience name for target.
+mc1d: projects/Ex4/CMakeFiles/mc1d.dir/rule
+.PHONY : mc1d
+
+# fast build rule for target.
+mc1d/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc1d.dir/build.make projects/Ex4/CMakeFiles/mc1d.dir/build
+.PHONY : mc1d/fast
+
+# Convenience name for target.
+projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/rule
+
+# Convenience name for target.
+run-ex4-mc1d: projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/rule
+.PHONY : run-ex4-mc1d
+
+# fast build rule for target.
+run-ex4-mc1d/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/build
+.PHONY : run-ex4-mc1d/fast
+
+# Convenience name for target.
+projects/Ex4/CMakeFiles/mc3d.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/mc3d.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/mc3d.dir/rule
+
+# Convenience name for target.
+mc3d: projects/Ex4/CMakeFiles/mc3d.dir/rule
+.PHONY : mc3d
+
+# fast build rule for target.
+mc3d/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc3d.dir/build.make projects/Ex4/CMakeFiles/mc3d.dir/build
+.PHONY : mc3d/fast
+
+# Convenience name for target.
+projects/Ex4/CMakeFiles/run-ex4-mcel.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-mcel.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/run-ex4-mcel.dir/rule
+
+# Convenience name for target.
+run-ex4-mcel: projects/Ex4/CMakeFiles/run-ex4-mcel.dir/rule
+.PHONY : run-ex4-mcel
+
+# fast build rule for target.
+run-ex4-mcel/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mcel.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mcel.dir/build
+.PHONY : run-ex4-mcel/fast
+
+# Convenience name for target.
+projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/rule:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/rule
+.PHONY : projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/rule
+
+# Convenience name for target.
+run-ex4-mc3d: projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/rule
+.PHONY : run-ex4-mc3d
+
+# fast build rule for target.
+run-ex4-mc3d/fast:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/build
+.PHONY : run-ex4-mc3d/fast
+
+mc1d.o: mc1d.c.o
+.PHONY : mc1d.o
 
 # target to build an object file
-util.c.o:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/util.c.o
-.PHONY : util.c.o
+mc1d.c.o:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc1d.dir/build.make projects/Ex4/CMakeFiles/mc1d.dir/mc1d.c.o
+.PHONY : mc1d.c.o
 
-util.i: util.c.i
-.PHONY : util.i
+mc1d.i: mc1d.c.i
+.PHONY : mc1d.i
 
 # target to preprocess a source file
-util.c.i:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/util.c.i
-.PHONY : util.c.i
+mc1d.c.i:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc1d.dir/build.make projects/Ex4/CMakeFiles/mc1d.dir/mc1d.c.i
+.PHONY : mc1d.c.i
 
-util.s: util.c.s
-.PHONY : util.s
+mc1d.s: mc1d.c.s
+.PHONY : mc1d.s
 
 # target to generate assembly for a file
-util.c.s:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/util.c.s
-.PHONY : util.c.s
+mc1d.c.s:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc1d.dir/build.make projects/Ex4/CMakeFiles/mc1d.dir/mc1d.c.s
+.PHONY : mc1d.c.s
 
-vmc.o: vmc.c.o
-.PHONY : vmc.o
+mc3d.o: mc3d.c.o
+.PHONY : mc3d.o
 
 # target to build an object file
-vmc.c.o:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/vmc.c.o
-.PHONY : vmc.c.o
+mc3d.c.o:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc3d.dir/build.make projects/Ex4/CMakeFiles/mc3d.dir/mc3d.c.o
+.PHONY : mc3d.c.o
 
-vmc.i: vmc.c.i
-.PHONY : vmc.i
+mc3d.i: mc3d.c.i
+.PHONY : mc3d.i
 
 # target to preprocess a source file
-vmc.c.i:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/vmc.c.i
-.PHONY : vmc.c.i
+mc3d.c.i:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc3d.dir/build.make projects/Ex4/CMakeFiles/mc3d.dir/mc3d.c.i
+.PHONY : mc3d.c.i
 
-vmc.s: vmc.c.s
-.PHONY : vmc.s
+mc3d.s: mc3d.c.s
+.PHONY : mc3d.s
 
 # target to generate assembly for a file
-vmc.c.s:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/vmc.c.s
-.PHONY : vmc.c.s
+mc3d.c.s:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc3d.dir/build.make projects/Ex4/CMakeFiles/mc3d.dir/mc3d.c.s
+.PHONY : mc3d.c.s
+
+mcel.o: mcel.c.o
+.PHONY : mcel.o
+
+# target to build an object file
+mcel.c.o:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/mcel.c.o
+.PHONY : mcel.c.o
+
+mcel.i: mcel.c.i
+.PHONY : mcel.i
+
+# target to preprocess a source file
+mcel.c.i:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/mcel.c.i
+.PHONY : mcel.c.i
+
+mcel.s: mcel.c.s
+.PHONY : mcel.s
+
+# target to generate assembly for a file
+mcel.c.s:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/mcel.c.s
+.PHONY : mcel.c.s
+
+test1.o: test1.c.o
+.PHONY : test1.o
+
+# target to build an object file
+test1.c.o:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.o
+.PHONY : test1.c.o
+
+test1.i: test1.c.i
+.PHONY : test1.i
+
+# target to preprocess a source file
+test1.c.i:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.i
+.PHONY : test1.c.i
+
+test1.s: test1.c.s
+.PHONY : test1.s
+
+# target to generate assembly for a file
+test1.c.s:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.s
+.PHONY : test1.c.s
 
 # Help Target
 help:
@@ -200,14 +332,26 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... run-ex4-vmc"
-	@echo "... vmc"
-	@echo "... util.o"
-	@echo "... util.i"
-	@echo "... util.s"
-	@echo "... vmc.o"
-	@echo "... vmc.i"
-	@echo "... vmc.s"
+	@echo "... run-ex4-mc1d"
+	@echo "... run-ex4-mc3d"
+	@echo "... run-ex4-mcel"
+	@echo "... run-ex4-test1"
+	@echo "... mc1d"
+	@echo "... mc3d"
+	@echo "... mcel"
+	@echo "... test1"
+	@echo "... mc1d.o"
+	@echo "... mc1d.i"
+	@echo "... mc1d.s"
+	@echo "... mc3d.o"
+	@echo "... mc3d.i"
+	@echo "... mc3d.s"
+	@echo "... mcel.o"
+	@echo "... mcel.i"
+	@echo "... mcel.s"
+	@echo "... test1.o"
+	@echo "... test1.i"
+	@echo "... test1.s"
 .PHONY : help
 
 

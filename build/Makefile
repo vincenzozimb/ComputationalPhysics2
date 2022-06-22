@@ -351,30 +351,108 @@ dft8/fast:
 .PHONY : dft8/fast
 
 #=============================================================================
-# Target rules for targets named run-ex4-vmc
+# Target rules for targets named run-ex4-test1
 
 # Build rule for target.
-run-ex4-vmc: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-vmc
-.PHONY : run-ex4-vmc
+run-ex4-test1: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-test1
+.PHONY : run-ex4-test1
 
 # fast build rule for target.
-run-ex4-vmc/fast:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-vmc.dir/build.make projects/Ex4/CMakeFiles/run-ex4-vmc.dir/build
-.PHONY : run-ex4-vmc/fast
+run-ex4-test1/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/build
+.PHONY : run-ex4-test1/fast
 
 #=============================================================================
-# Target rules for targets named vmc
+# Target rules for targets named test1
 
 # Build rule for target.
-vmc: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 vmc
-.PHONY : vmc
+test1: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test1
+.PHONY : test1
 
 # fast build rule for target.
-vmc/fast:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/vmc.dir/build.make projects/Ex4/CMakeFiles/vmc.dir/build
-.PHONY : vmc/fast
+test1/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/build
+.PHONY : test1/fast
+
+#=============================================================================
+# Target rules for targets named mcel
+
+# Build rule for target.
+mcel: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mcel
+.PHONY : mcel
+
+# fast build rule for target.
+mcel/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/build
+.PHONY : mcel/fast
+
+#=============================================================================
+# Target rules for targets named mc1d
+
+# Build rule for target.
+mc1d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mc1d
+.PHONY : mc1d
+
+# fast build rule for target.
+mc1d/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc1d.dir/build.make projects/Ex4/CMakeFiles/mc1d.dir/build
+.PHONY : mc1d/fast
+
+#=============================================================================
+# Target rules for targets named run-ex4-mc1d
+
+# Build rule for target.
+run-ex4-mc1d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-mc1d
+.PHONY : run-ex4-mc1d
+
+# fast build rule for target.
+run-ex4-mc1d/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/build
+.PHONY : run-ex4-mc1d/fast
+
+#=============================================================================
+# Target rules for targets named mc3d
+
+# Build rule for target.
+mc3d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mc3d
+.PHONY : mc3d
+
+# fast build rule for target.
+mc3d/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mc3d.dir/build.make projects/Ex4/CMakeFiles/mc3d.dir/build
+.PHONY : mc3d/fast
+
+#=============================================================================
+# Target rules for targets named run-ex4-mcel
+
+# Build rule for target.
+run-ex4-mcel: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-mcel
+.PHONY : run-ex4-mcel
+
+# fast build rule for target.
+run-ex4-mcel/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mcel.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mcel.dir/build
+.PHONY : run-ex4-mcel/fast
+
+#=============================================================================
+# Target rules for targets named run-ex4-mc3d
+
+# Build rule for target.
+run-ex4-mc3d: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-mc3d
+.PHONY : run-ex4-mc3d
+
+# fast build rule for target.
+run-ex4-mc3d/fast:
+	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/build.make projects/Ex4/CMakeFiles/run-ex4-mc3d.dir/build
+.PHONY : run-ex4-mc3d/fast
 
 # Help Target
 help:
@@ -392,7 +470,10 @@ help:
 	@echo "... run-ex3-20"
 	@echo "... run-ex3-40"
 	@echo "... run-ex3-8"
-	@echo "... run-ex4-vmc"
+	@echo "... run-ex4-mc1d"
+	@echo "... run-ex4-mc3d"
+	@echo "... run-ex4-mcel"
+	@echo "... run-ex4-test1"
 	@echo "... run-test"
 	@echo "... bessel_test"
 	@echo "... bound1d"
@@ -400,10 +481,13 @@ help:
 	@echo "... dft20"
 	@echo "... dft40"
 	@echo "... dft8"
+	@echo "... mc1d"
+	@echo "... mc3d"
+	@echo "... mcel"
 	@echo "... myfunc"
 	@echo "... scatt"
 	@echo "... test"
-	@echo "... vmc"
+	@echo "... test1"
 .PHONY : help
 
 

@@ -27,11 +27,11 @@
 	[
 		{
 			"backtrace" : 1,
-			"id" : "vmc::@24dfdae87deb5d0085b7"
+			"id" : "mc1d::@24dfdae87deb5d0085b7"
 		}
 	],
-	"id" : "run-ex4-vmc::@24dfdae87deb5d0085b7",
-	"name" : "run-ex4-vmc",
+	"id" : "run-ex4-mc1d::@24dfdae87deb5d0085b7",
+	"name" : "run-ex4-mc1d",
 	"paths" : 
 	{
 		"build" : "projects/Ex4",
@@ -59,13 +59,13 @@
 		{
 			"backtrace" : 1,
 			"isGenerated" : true,
-			"path" : "build/projects/Ex4/CMakeFiles/run-ex4-vmc",
+			"path" : "build/projects/Ex4/CMakeFiles/run-ex4-mc1d",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 0,
 			"isGenerated" : true,
-			"path" : "build/projects/Ex4/CMakeFiles/run-ex4-vmc.rule",
+			"path" : "build/projects/Ex4/CMakeFiles/run-ex4-mc1d.rule",
 			"sourceGroupIndex" : 1
 		}
 	],

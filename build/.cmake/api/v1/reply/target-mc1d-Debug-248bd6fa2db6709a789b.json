@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "projects/Ex4/vmc"
+			"path" : "projects/Ex4/mc1d"
 		}
 	],
 	"backtrace" : 1,
@@ -105,8 +105,7 @@
 			},
 			"sourceIndexes" : 
 			[
-				0,
-				1
+				0
 			]
 		}
 	],
@@ -117,7 +116,7 @@
 			"id" : "myfunc::@930a52a46afb7a1b5d12"
 		}
 	],
-	"id" : "vmc::@24dfdae87deb5d0085b7",
+	"id" : "mc1d::@24dfdae87deb5d0085b7",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -176,8 +175,8 @@
 		],
 		"language" : "C"
 	},
-	"name" : "vmc",
-	"nameOnDisk" : "vmc",
+	"name" : "mc1d",
+	"nameOnDisk" : "mc1d",
 	"paths" : 
 	{
 		"build" : "projects/Ex4",
@@ -189,8 +188,7 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0,
-				1
+				0
 			]
 		}
 	],
@@ -199,13 +197,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "projects/Ex4/vmc.c",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "projects/Ex4/util.c",
+			"path" : "projects/Ex4/mc1d.c",
 			"sourceGroupIndex" : 0
 		}
 	],

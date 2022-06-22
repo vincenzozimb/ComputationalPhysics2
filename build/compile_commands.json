@@ -96,12 +96,22 @@
 },
 {
   "directory": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4",
-  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/vmc.dir/vmc.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/vmc.c",
-  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/vmc.c"
+  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/test1.dir/test1.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/test1.c",
+  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/test1.c"
 },
 {
   "directory": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4",
-  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/vmc.dir/util.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/util.c",
-  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/util.c"
+  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/mcel.dir/mcel.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mcel.c",
+  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mcel.c"
+},
+{
+  "directory": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4",
+  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/mc1d.dir/mc1d.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mc1d.c",
+  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mc1d.c"
+},
+{
+  "directory": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4",
+  "command": "/usr/bin/clang  -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/PUBLIC -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build -I/Users/teresa/Desktop/Repositories/ComputationalPhysics2/myfunc -isystem /opt/homebrew/Cellar/gsl/2.6/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wall -O3 -std=gnu11 -o CMakeFiles/mc3d.dir/mc3d.c.o -c /Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mc3d.c",
+  "file": "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mc3d.c"
 }
 ]

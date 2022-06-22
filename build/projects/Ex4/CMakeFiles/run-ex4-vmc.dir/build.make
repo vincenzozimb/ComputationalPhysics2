@@ -67,7 +67,7 @@ include projects/Ex4/CMakeFiles/run-ex4-vmc.dir/compiler_depend.make
 include projects/Ex4/CMakeFiles/run-ex4-vmc.dir/progress.make
 
 projects/Ex4/CMakeFiles/run-ex4-vmc: projects/Ex4/vmc
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./vmc && gnuplot plot_Vext.gp
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./vmc && gnuplot plot.gp
 
 run-ex4-vmc: projects/Ex4/CMakeFiles/run-ex4-vmc
 run-ex4-vmc: projects/Ex4/CMakeFiles/run-ex4-vmc.dir/build.make
