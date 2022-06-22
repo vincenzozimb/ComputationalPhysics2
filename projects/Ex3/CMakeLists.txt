@@ -7,12 +7,12 @@ target_link_libraries(dft8 m myfunc lapack GSL::gsl GSL::gslcblas)
 
 # add custom commands
 add_custom_target(run-ex3-8
-COMMAND dft8 #&& gnuplot plot_8.gp
+COMMAND dft8 && gnuplot plot_wf_free.gp
 DEPENDS dft8 
 WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_8.gp
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot_wf_free.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ########################################################### dft20

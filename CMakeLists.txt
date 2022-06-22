@@ -19,3 +19,4 @@ include_directories(PUBLIC
 add_subdirectory(projects/test)
 add_subdirectory(projects/Ex1)
 add_subdirectory(projects/Ex3)
+add_subdirectory(projects/Ex4)

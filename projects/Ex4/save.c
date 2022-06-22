@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <gsl/gsl_matrix_double.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_blas.h>
+
+#include "print_routines.h"
+#define DIMx 1000
+#define DIMe 100
+#define N 8
+
+static size_t size = 4;
+
+/* ======================= FUNCTION HEADERS ======================= */
+double Psi0(double eta, double r);
+double Psi1(double eta, double r, double x);
+void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[4], double R[3][4]);
+gsl_matrix * invert_a_matrix(gsl_matrix *matrix);
+void print_mat_contents(gsl_matrix *matrix);
+double determinant_of_matrix(gsl_matrix *matrix);
+
+
+/* ======================= MAIN ======================= */
+int main(){
+
+/* Initial positions */
+// double L = 8.0;
+// double h = L / (DIMx - 1);
+double X[3][4]; // initial positions : 3D and 4 electrons
+double r2[4], r[4];
+/* Initialize positions of 4 electrons - a caso */
+X[0][0] = 1.0; X[1][0] = 0.2; X[2][0] = 0.5;
+X[0][1] = 0.0; X[1][1] = 1.0; X[2][1] = 0.0; 
+X[0][2]= 1.0; X[1][2] = 2.0; X[2][2] = 1.0;
+X[0][3] = 0.5; X[1][3] = 1.0; X[2][3] = 1.5;
+
+double posOld[3][4], posNew[3][4]; 
+ 
+// for (int ii = 0; ii < 3; ii++)
+// {
+//     for (int jj = 0; jj < 4; jj++)
+//     {
+//         X[ii][jj] = rand()/(double)RAND_MAX;
+//         printf("%lf\t", X[ii][jj]);
+//     }
+//    printf("\n");
+// }
+for (int jj = 0; jj < 4; jj++)
+{
+    r2[jj] = X[0][jj] * X[0][jj] + X[1][jj] * X[1][jj] + X[2][jj] * X[2][jj]; 
+    r[jj] = sqrt(r2[jj]);
+    //printf("r2[%d] = %lf\n", jj, r2[jj]);
+}
+
+
+/* Variational parameters */
+double eta[DIMe];
+double eta_init = 0.3;
+double eta_end = 5.0;
+double deta = (eta_end - eta_init)/(DIMe - 1.0);
+
+/* Energy and variance */
+double Etot = 0.0;
+double Etot2 = 0.0;
+
+/* Slater matrix */
+gsl_matrix *Aup = gsl_matrix_alloc(size,size);
+
+// Make 4 electrons evolve together
+for (int ee = 0; ee < DIMe; ee++)
+{
+    eta[ii] = eta_init + ii * deta;
+
+    Etot = 0.0;
+    Etot2 = 0.0;
+
+
+}
+   initialize_mat_contents(Aup, eta[ee], r, X);
+printf("Aup : \n");
+print_mat_contents(Aup);
+printf("\n");
+
+// gsl_matrix_free(Aup);
+
+/* Inverse of Aup matrix */
+gsl_matrix *Aup_inv = invert_a_matrix(Aup);
+printf("Inverse Aup: \n");
+print_mat_contents(Aup_inv);
+printf("\n");
+
+/* Re-initialization*/
+initialize_mat_contents(Aup, eta[45], r, X);
+printf("Aup : \n");
+print_mat_contents(Aup);
+printf("\n");
+printf("eta[]:%lf\n", eta[45]);
+
+/* Slater determinant of A matrix */
+
+double detAup;
+
+detAup = determinant_of_matrix(Aup);
+printf("\n\n detAup = %lf\n\n", detAup);
+gsl_matrix_free(Aup);
+}
+/* ======================= FUNCTION BODIES ======================= */
+
+double Psi0(double eta, double r){
+    return exp(-r * r /(2.0 * eta * eta));
+}
+
+double Psi1(double eta, double r, double x){
+    return x * exp(-r * r /(2.0 * eta * eta));
+}
+
+void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[4], double R[3][4]){
+
+    double val; 
+    for ( size_t ii = 0; ii < size; ii++) // run over 4 positions of electrons
+    {
+        for ( size_t jj = 0; jj < size; jj++) // run over the wf of the 4 electrons
+        {
+            if(jj == 0){
+                val = Psi0(eta, r[ii]);
+                gsl_matrix_set(matrix, ii, jj, val);
+            } else {
+                 val = Psi1(eta, r[ii], R[ii][jj]);
+                 gsl_matrix_set(matrix, ii, jj, val);
+            }
+
+        }
+        
+    }
+    
+}
+
+gsl_matrix * invert_a_matrix(gsl_matrix *matrix)
+{
+    gsl_permutation *p = gsl_permutation_alloc(size);
+    int s;
+
+    // Compute the LU decomposition of this matrix
+    gsl_linalg_LU_decomp(matrix, p, &s);
+
+    // Compute the  inverse of the LU decomposition
+    gsl_matrix *inv = gsl_matrix_alloc(size, size);
+    gsl_linalg_LU_invert(matrix, p, inv);
+
+    gsl_permutation_free(p);
+
+    return inv;
+}
+
+void print_mat_contents(gsl_matrix *matrix)
+{
+    size_t i, j;
+    double element;
+
+    for (i = 0; i < size; ++i) {
+        for (j = 0; j < size; ++j) {
+            element = gsl_matrix_get(matrix, i, j);
+            printf("%f ", element);
+        }
+        printf("\n");
+    }
+}
+
+double determinant_of_matrix(gsl_matrix *matrix){
+int detMat;
+    
+    gsl_permutation *p = gsl_permutation_alloc(size);
+    int s;
+    int signum = 1;
+
+    // Compute the LU decomposition of this matrix
+    gsl_linalg_LU_decomp(matrix, p, &s);
+
+
+    detMat = gsl_linalg_LU_det(matrix, signum);
+    gsl_permutation_free(p);
+return detMat;
+}

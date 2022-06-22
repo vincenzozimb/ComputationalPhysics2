@@ -42,7 +42,7 @@ void add_pot_centr(double v[], int l);
 void solve_radialSE_diagonalize(int Nb, double v[], double E[], double psi[][Nb]);
 void normalize(int Nb, double psi[][Nb]);
 void add_density(int Nb, double n[], double psi[][Nb], int l);
-void solve_first_closed_shell(double E[2], double n[], double v[]); // this is the only function specialized to the case N = 8
+void solve_first_closed_shell(double E[2], double n[], double v[], double  psi1[dim][1], double psi2[dim][1]); // this is the only function specialized to the case N = 8
 void density_integral(double n[]);
 void add_pot_exc(double v[], double n[]);
 void add_pot_coulomb(double v[], double n[]);
@@ -88,14 +88,19 @@ int main(){
     /* variables */
     double v[dim], n_free[dim];
     double E[2];
+    double psi1[dim][1], psi2[dim][1];
 
+    
     fill_position();
 
 
     /* Solving the SE for N = 8 non interacting electrons, in total we will have 2 orbitals (0s 0p) */
     fill_pot_unch(v,free_e=true);
-    solve_first_closed_shell(E,n_free,v);
+    solve_first_closed_shell(E,n_free,v, psi1, psi2);
     print_func(r,n_free,dim,"density_free.csv");
+    print_func(r,psi1,dim,"wf1_free.csv");
+    print_func(r,psi2,dim,"wf2_free.csv");
+    
     
     printf("=============== FREE ELECTRONS ===============\n");
     printf("The free energies are E_nl:\n");
@@ -117,7 +122,7 @@ int main(){
         add_pot_coulomb(v_step,n_old);
         add_pot_exc(v_step,n_old);
         copy_vec(n_old,n,dim);
-        solve_first_closed_shell(E,n,v_step);
+        solve_first_closed_shell(E,n,v_step, psi1,psi2);
         check = L_one_distance(n,n_old,dim);
         mixing_n(n_old,n);
         cnt++;
@@ -282,13 +287,13 @@ void add_density(int Nb, double n[], double psi[][Nb], int l){
     }
 }
 
-void solve_first_closed_shell(double E[2], double n[], double v[]){
+void solve_first_closed_shell(double E[2], double n[], double v[], double  psi1[dim][1], double psi2[dim][1]){
     // diagonalize the SE for the 0s and 0p orbitals. Calculate the energies and fill the density array.
     double pot[dim];
     int l;
     
     int Nb = 1;
-    double en[Nb], psi[dim][Nb];
+    double en[Nb];
 
     fill_zero(n,dim);
 
@@ -296,18 +301,18 @@ void solve_first_closed_shell(double E[2], double n[], double v[]){
     copy_vec(v,pot,dim);
     l = 0; Nb = 1;
     add_pot_centr(pot,l);
-    solve_radialSE_diagonalize(Nb,pot,en,psi);
-    normalize(Nb,psi);
-    add_density(Nb,n,psi,l);
+    solve_radialSE_diagonalize(Nb,pot,en,psi1);
+    normalize(Nb,psi1);
+    add_density(Nb,n,psi1,l);
     E[0] = en[0];
 
     // 0p
     copy_vec(v,pot,dim);
     l = 1; Nb = 1;
     add_pot_centr(pot,l);
-    solve_radialSE_diagonalize(Nb,pot,en,psi);
-    normalize(Nb,psi);
-    add_density(Nb,n,psi,l);
+    solve_radialSE_diagonalize(Nb,pot,en,psi2);
+    normalize(Nb,psi2);
+    add_density(Nb,n,psi2,l);
     E[1] = en[0];
    
 }
