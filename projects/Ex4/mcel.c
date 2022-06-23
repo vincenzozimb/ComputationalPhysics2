@@ -5,33 +5,17 @@
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
 #include <string.h>
+#include <time.h>
 
+#include "util.h"
 #include "print_routines.h"
-#define DIMx 100
-#define DIMe 5
-#define N2 4 // N = 8 electrons (4 spin up and 4 spin down)
-#define N 8
-#define DIM 3
-#define M 100000 // number of MC steps
 
-static size_t size = 4;
 
-/* ======================= FUNCTION HEADERS ======================= */
-double Psi0(double eta, double r);
-double Psi1(double eta, double r, double x);
-void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[4], double R[3][4]);
-gsl_matrix * invert_a_matrix(gsl_matrix *matrix);
-void print_mat_contents(gsl_matrix *matrix);
-double determinant_of_matrix(gsl_matrix *matrix);
-double Vext(double r, double R, double rho);
-
-double localEnergy();
-
-/* ======================= MAIN ======================= */
 int main(){
 
-/* Parameters of the system */
-char atom[] = "Na"; // specify the atom type. Choose "Na" for sodium or "K" for potassium
+/* ------------------------------- PARAMETERS OF THE SYSTEM ------------------------------- */
+/* Specify the atom type. Choose "Na" for sodium or "K" for potassium */
+char atom[] = "Na";  
 double rs, Ray, rho;
     if(!strcmp(atom,"Na")){
         rs = 3.93;
@@ -47,7 +31,7 @@ double rs, Ray, rho;
 
 /* Initial positions */
 double Xold[DIM][N2]; // initial positions : 3D and 4 electrons
-double Xnew[DIM][N2];
+double Xnew[DIM][N2]; 
 double L = 3.0 * Ray;
 double h = L/(DIMx -1.0);
 double x[DIMx], Vex[DIMx];
@@ -61,6 +45,7 @@ for (int ii = 0; ii < DIM; ii++)
     }
 }
 
+/* Create a mesh of positions and the external potential Vex */
 for (int ii = 0; ii < DIMx; ii++)
 {
     x[ii] = ii * h;
@@ -72,7 +57,7 @@ pf = fopen("dataVext.csv", "w");
 fprint_two_vec(pf, x, Vex, DIMx);
 fclose(pf);
 
-double r2[4], r[4];
+double r2[4], r[4]; // radius squared and radius
 for (int jj = 0; jj < 4; jj++)
 {
     r2[jj] = Xold[0][jj] * Xold[0][jj] + Xold[1][jj] * Xold[1][jj] + Xold[2][jj] * Xold[2][jj]; 
@@ -83,48 +68,73 @@ for (int jj = 0; jj < 4; jj++)
 
 /* Variational parameters */
 double eta[DIMe];
-double eta_init = 1.0;
-double eta_end = 5.0;
+double eta_init = 0.2;
+double eta_end = 1.5;
 double deta = (eta_end - eta_init)/(DIMe);
 
 /* Energy and variance */
-double Etot = 0.0;
-double Etot2 = 0.0;
+double Etot_1 = 0.0;
+double Etot_2 = 0.0;
+double Etot2_1 = 0.0;
+double Etot2_2 = 0.0;
+double Var = 0.0;
+double dE_1, dE_2;
+double Energies_1[DIMe];
+double Energies_2[DIMe];
+double Variances[DIMe];
 
-double gradAup[N2][N2];
+/* Matrices */
+gsl_matrix *Aup = gsl_matrix_alloc(size,size); // Slater matrix for 4 electrons with spin up
+gsl_matrix *Aup_inv = gsl_matrix_alloc(size,size); // Inverse of the Slater matrix for 4 electrons with spin up
+gsl_matrix *gradAup_x = gsl_matrix_alloc(size, size); // Component x of gradient of Aup
+gsl_matrix *gradAup_y = gsl_matrix_alloc(size, size); // Component y of gradient of Aup
+gsl_matrix *gradAup_z = gsl_matrix_alloc(size, size); // Component z of gradient of Aup
+gsl_matrix *lapAup = gsl_matrix_alloc(size, size); // Laplacian of the matrix Aup
+double detAup = 0.0; // Slater determinant of the matrix Aup
+double GDratio_up[DIM][N2]; // Gradient determinant-to-determinant ratio for Aup
+double LDratio_up[N2]; // Laplacian determinant-to-determinant ratio fo Aup
 
-/* Slater matrix */
-gsl_matrix *Aup = gsl_matrix_alloc(size,size);
-gsl_matrix *Adown = gsl_matrix_alloc(size,size);
-gsl_matrix *Aup_inv = gsl_matrix_alloc(size,size);
-gsl_matrix *Adown_inv = gsl_matrix_alloc(size,size);
+gsl_matrix *Adown = gsl_matrix_alloc(size,size); // Slater matrix for 4 electrons with spin down
+gsl_matrix *Adown_inv = gsl_matrix_alloc(size,size); // Inverse of the Slater matrix for 4 electrons with spin down
+gsl_matrix *gradAdown_x = gsl_matrix_alloc(size, size); // Component x of gradient of Adown
+gsl_matrix *gradAdown_y = gsl_matrix_alloc(size, size); // Component y of gradient of Adown
+gsl_matrix *gradAdown_z = gsl_matrix_alloc(size, size); // Component z of gradient of Adown
+gsl_matrix *lapAdown = gsl_matrix_alloc(size, size); // Laplacian of the matrix Adown
+double detAdown = 0.0; // Slater determinant of the matrix Adown
+double GDratio_down[DIM][N2]; // Gradient determinant-to-determinant ratio for Adown
+double LDratio_down[N2]; // Laplacian determinant-to-determinant ratio fo Adown
 
-double detAup, detAdown;
-
+/* Total wave functions */
 double psiOld, psiNew;
 
-/* Evolution of the system : need 4 electrons to evolve individually */
-/* Non interacting electrons - no Jastrow factor */
+int index;
+
+/* ------------------------------- EVOLUTION OF THE SYSTEM : 4 NON-INTERACTING ELECTRONS ------------------------------- */
 for (int ee = 0; ee < DIMe; ee++)
 {
-    eta[ee] = eta_init + ee * deta;
+    eta[ee] = eta_init + ee * deta; // initialize variational parameters
 
-    Etot = 0.0;
-    Etot2 = 0.0;
+    Etot_1 = 0.0; // initialize total energy at each cycle
+    Etot2_1 = 0.0;
+    Etot_2 = 0.0; // initialize total energy at each cycle
+    Etot2_2 = 0.0;
 
-    /* Initialization of the matrix of positions : column -> electron, row -> x,y,z (determine th eposition in which
-     I'm considering the electron )*/
-    printf("Xold: \n");
+/* ########################################## Initialization ############################################# */
+    /* Initialization of the matrix of positions : column -> electron, row -> x,y,z ( position in which
+     I'm considering the electron) */
+   // printf("Xold initial: \n");
+   //printf("Xold\n");
     for (int ii = 0; ii < DIM; ii++)
     {
         for (int jj = 0; jj < N2; jj++)
         {
             Xold[ii][jj] = h * (rand()/(double)RAND_MAX - 1.0/2.0);
-            printf("%lf\t", Xold[ii][jj]);
+            //printf("%lf\t", Xold[ii][jj]);
         }
-        printf("\n");
+        //printf("\n");
     }
-    printf("\n");
+    //printf("\n");
+
     /* Calculation of r */
     for (int ii = 0; ii < N2; ii++)
     {
@@ -132,164 +142,114 @@ for (int ee = 0; ee < DIMe; ee++)
         r[ii] = sqrt(r2[ii]);
     }
     
-    /* Initialization of matrices A and A^(-1) */
-    initialize_mat_contents(Aup, eta[ee], r, Xold);
-    printf("Aup:\n");
-    print_mat_contents(Aup);
-    printf("\n");
-    initialize_mat_contents(Adown, eta[ee], r, Xold);
-    Aup_inv = invert_a_matrix(Aup);
-    Adown_inv = invert_a_matrix(Adown);
-     /* Re-initialization */
-    initialize_mat_contents(Aup, eta[ee], r, Xold);
-    initialize_mat_contents(Adown, eta[ee], r, Xold);
-     /* Slater Determinant*/
-    detAup = determinant_of_matrix(Aup);
-    printf("det : %lf\n", detAup);
-    detAdown = determinant_of_matrix(Adown);
+    /* Aup */
+    initialization_of_wf(Aup, Aup_inv, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xold);
+    // printf("Aup\n");
+    // print_mat_contents(Aup);
+    // printf("\n");
+    // printf("GDratio_up\n");
+    // for (int ii = 0; ii < DIM; ii++)
+    // {
+    //     for (int jj = 0; jj < N2; jj++)
+    //     {
+    //        printf("%lf\t", GDratio_up[ii][jj]);
+    //     }
+    //     printf("\n");
+        
+    // }
+    
+    
+    /* Adown */
+    initialization_of_wf(Adown, Adown_inv, gradAdown_x, gradAdown_y, gradAdown_z, lapAdown, GDratio_down, LDratio_down, detAdown, eta[ee], r, Xold);
 
-    psiOld = detAup * detAdown;
+    /* ################################################ Evolution ################################################# */
 
-    /* Monte Carlo loop */
+    psiOld = detAup * detAdown; // initial trial wave function with electrons in specific positions
+
+    srand(time(0));
+
+    /* ------------------------------------------------ Monte Carlo loop ------------------------------------------------*/
     for (int mm = 0; mm < M; mm++)
     {
-        // Sposto su un indice preso a random 
-    
-        //for (int ii = 0; ii < N2; ii++) // here am I making evolve the whole system?
-        // {
-            for (int jj = 0; jj < DIM; jj++)
+        index = randomGenerator(0 , 3); // take the evolving electron in a random way
+        //printf("index: %d\n", index);
+
+        /* Update positions */
+        for (int ii = 0; ii < DIM; ii++)
+        {
+            for (int jj = 0; jj < N2; jj++)
             {
-                Xnew[ii][jj] = Xold[ii][jj] + h * (rand()/(double)RAND_MAX - 1.0/2.0);
-            }
+                if (jj == index)
+                {
+                    Xnew[ii][jj] = Xold[ii][jj] + h * (rand()/(double)RAND_MAX - 1.0/2.0);
+                } else {
+                    Xnew[ii][jj] = Xold[ii][jj];
+                }
+                    
+                }
+    
+            }    
             
-        // }
-        initialize_mat_contents(Aup, eta[ee], r, Xnew);
-        initialize_mat_contents(Adown, eta[ee], r, Xnew);
-        detAup = determinant_of_matrix(Aup);
-        detAdown = determinant_of_matrix(Adown);
-        // printf("Det: %lf\n", detAup);
+        /*  Evaluation of wf in Xnew */
+        evolution_of_wf(Aup, Aup_inv, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xnew);
+        evolution_of_wf(Adown, Adown_inv, gradAdown_x, gradAdown_y, gradAdown_z, lapAdown, GDratio_down, LDratio_down, detAdown, eta[ee], r, Xold);
+
         psiNew = detAup * detAdown;
 
+    
         /* Metropolis test */
         if (rand()/(double)RAND_MAX <= psiNew * psiNew/(psiOld * psiOld))
         {
-            for (int ii = 0; ii < N2; ii++)
+           for (int ii = 0; ii < DIM; ii++)
             {
-                for (int jj = 0; jj < DIM; jj++)
+                for (int jj = 0; jj < N2; jj++)
                 {
-                    Xold[ii][jj] = Xnew[ii][jj];
+                    if (jj == index)
+                    {
+                        Xold[ii][jj] = Xnew[ii][jj];
+                    } else {
+                        Xold[ii][jj] = Xold[ii][jj];
+                    }
+                    
                 }
-            }
-            psiOld = psiNew;
+    
+            }    
+            psiOld = psiNew; // Updated wave function
         }
+
         /* Compute local energy */
         // avoided thermalisation
-
-    
-    // Implementation of the local energy : laplacian and gradient
-    }
-    
-
-}
-
-// gsl_matrix_free(Aup);
-// gsl_matrix_free(Adown);
-// gsl_matrix_free(Aup_inv);
-// gsl_matrix_free(Adown_inv);
-
-
-
-
-
-
-}
-/* ======================= FUNCTION BODIES ======================= */
-
-double Psi0(double eta, double r){
-    return exp(-r * r /(2.0 * eta * eta));
-}
-
-double Psi1(double eta, double r, double x){
-    return x * exp(-r * r /(2.0 * eta * eta));
-}
-
-void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[4], double R[3][4]){
-
-    double val = 0.0; 
-for ( size_t jj = 0; jj < size; jj++) // run over collumns the wf of the 4 electrons
-    {
-    for ( size_t ii = 0; ii < size; ii++) // run over row 4 positions of electrons
-        {
-            if(jj == 0){
-                val = Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, jj, val);
-            } else {
-                 val = Psi1(eta, r[ii], R[jj-1][ii]);
-                 gsl_matrix_set(matrix, ii, jj, val);
-            }
-
-        }
-        
-    }
-    
-}
-
-gsl_matrix * invert_a_matrix(gsl_matrix *matrix)
-{
-    gsl_permutation *p = gsl_permutation_alloc(size);
-    int s;
-    // Compute the LU decomposition of this matrix
-    gsl_linalg_LU_decomp(matrix, p, &s);
-    // Compute the  inverse of the LU decomposition
-    gsl_matrix *inv = gsl_matrix_alloc(size, size);
-    gsl_linalg_LU_invert(matrix, p, inv);
-
-    gsl_permutation_free(p);
-
-    return inv;
-}
-
-void print_mat_contents(gsl_matrix *matrix)
-{
-    size_t i, j;
-    double element;
-
-    for (i = 0; i < size; ++i) {
-        for (j = 0; j < size; ++j) {
-            element = gsl_matrix_get(matrix, i, j);
-            printf("%f ", element);
-        }
-        printf("\n");
-    }
-}
-
-double determinant_of_matrix(gsl_matrix *matrix){
-
-double detMat;
-    
-    gsl_permutation *p = gsl_permutation_alloc(size);
-    int s;
-
-    // Compute the LU decomposition of this matrix (s = 1)
-     gsl_linalg_LU_decomp(matrix, p, &s);
-     detMat = gsl_linalg_LU_det(matrix, s);
-
-    gsl_permutation_free(p);
-return detMat;
-}
-
-double Vext(double r, double R, double rho){
-    double a = 2.0 * M_PI * rho;
-    if (r <= R)
-    {
-        return a * (r * r/3.0 - R * R);
-    } else {
-        return a * -2.0/3.0 * R * R * R/r;
+        dE_1 = localEnergy1( LDratio_up, LDratio_down); 
+        dE_2 = localEnergy2( LDratio_up, LDratio_down, GDratio_up, GDratio_down );
+        Etot_1 += dE_1;
+        Etot_2 += dE_2;
+        Etot2_1 += dE_1 * dE_1;
+        Etot2_2 += dE_2 * dE_2;
     
     }
-    
+
+    Etot_1 /= M;
+    Etot2_1 /= M;
+    Etot_2 /= M;
+    Etot2_2 /= M;
+    // Var = Etot2 - Etot *Etot;
+    Energies_1[ee] = Etot_1;
+    Energies_2[ee] = Etot_2;
+    // Variances[ee] = Var;
 }
 
-double localEnergy(){
-    
+/* Print results on file */
+FILE *pf2;
+pf2 = fopen("dataEnEl.csv", "w");
+fprint_three_vec(pf2, eta, Energies_1,Energies_2, DIMe);
+fclose(pf2);
+
+
+/* Free memory space */
+gsl_matrix_free(Aup);   gsl_matrix_free(Adown);
+gsl_matrix_free(Aup_inv);   gsl_matrix_free(Adown_inv);
+gsl_matrix_free(gradAup_x);   gsl_matrix_free(gradAup_y);   gsl_matrix_free(gradAup_z);
+gsl_matrix_free(gradAdown_x);   gsl_matrix_free(gradAdown_y);   gsl_matrix_free(gradAdown_z);
+gsl_matrix_free(lapAup);    gsl_matrix_free(lapAdown);
+
 }

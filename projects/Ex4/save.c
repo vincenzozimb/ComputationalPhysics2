@@ -182,3 +182,54 @@ int detMat;
     gsl_permutation_free(p);
 return detMat;
 }
+
+
+
+
+    initialize_mat_contents(Adown, eta[ee], r, Xold); //Initialize matrix Aup
+    gradient_of_matrix(gradAdown_x, eta[ee], r, Xold, 0); // Gradient of Adown - Adown_x
+    gradient_of_matrix(gradAdown_y, eta[ee], r, Xold, 1); // Gradient of Adown - Adown_y
+    gradient_of_matrix(gradAdown_z, eta[ee], r, Xold, 2); // Gradient of Adown - Adown_z
+    laplacian_of_matrix(lapAdown, eta[ee], r, Xold); // Laplacian of Adown
+    Adown_inv = invert_a_matrix(Adown); // Inverse of Adown
+    initialize_mat_contents(Adown, eta[ee], r, Xold); // Re-initialize Adown
+    GDtoDR_old(gradAdown_x,gradAdown_y, gradAdown_z, Adown_inv, GDratio_down); GDtoD ratio
+    LDtoDR(lapAdown, Adown_inv, LDratio_down); // LDtoD ratio
+    detAdown = determinant_of_matrix(Adown); // Slater determinant
+
+
+    initialize_mat_contents(Aup, eta[ee], r, Xold); //Initialize matrix Aup
+    // // printf("Aup:\n");
+    // // print_mat_contents(Aup);
+    // // printf("\n");
+
+    // gradient_of_matrix(gradAup_x, eta[ee], r, Xold, 0); // Gradient of Aup - grAup_x
+    // // printf("gradAupx:\n");
+    // // print_mat_contents(gradAup_x);
+    // // printf("\n"); 
+    // gradient_of_matrix(gradAup_y, eta[ee], r, Xold, 1); // Gradient of Aup - grAup_y
+    // gradient_of_matrix(gradAup_z, eta[ee], r, Xold, 2); // Gradient of Aup - grAup_z
+
+    // laplacian_of_matrix(lapAup, eta[ee], r, Xold); // Laplacian of Aup
+    // // printf("lapAup: \n");
+    // // print_mat_contents(lapAup);
+    // // printf("\n");
+
+    // Aup_inv = invert_a_matrix(Aup); // Inverse of Aup
+
+    // initialize_mat_contents(Aup, eta[ee], r, Xold); // Re-initialize Aup
+
+    // GDtoDR_old(gradAup_x,gradAup_y, gradAup_z, Aup_inv, GDratio_up); // GDtoD ratio
+    // // printf("GDtoDR_old: \n"); 
+    // // print_mat_contents2(GDratio_up);
+    // // printf("\n");
+
+    // LDtoDR(lapAup, Aup_inv, LDratio_up); // LDtoD ratio
+    // // for (int ii = 0; ii < N2; ii++)
+    // // {
+    // //     printf("LDratio[%d] =%lf\t", ii, LDratio_up[ii]);
+    // // }
+    // // printf("\n");
+
+    // detAup = determinant_of_matrix(Aup); // Slater determinant
+    // //printf("det initial : %lf\n", detAup);

@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/mcel.c" "projects/Ex4/CMakeFiles/mcel.dir/mcel.c.o" "gcc" "projects/Ex4/CMakeFiles/mcel.dir/mcel.c.o.d"
+  "/Users/teresa/Desktop/Repositories/ComputationalPhysics2/projects/Ex4/util.c" "projects/Ex4/CMakeFiles/mcel.dir/util.c.o" "gcc" "projects/Ex4/CMakeFiles/mcel.dir/util.c.o.d"
   )
 
 # Targets to which this target links.

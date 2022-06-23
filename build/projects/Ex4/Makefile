@@ -324,6 +324,30 @@ test1.c.s:
 	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.s
 .PHONY : test1.c.s
 
+util.o: util.c.o
+.PHONY : util.o
+
+# target to build an object file
+util.c.o:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/util.c.o
+.PHONY : util.c.o
+
+util.i: util.c.i
+.PHONY : util.i
+
+# target to preprocess a source file
+util.c.i:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/util.c.i
+.PHONY : util.c.i
+
+util.s: util.c.s
+.PHONY : util.s
+
+# target to generate assembly for a file
+util.c.s:
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/util.c.s
+.PHONY : util.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -352,6 +376,9 @@ help:
 	@echo "... test1.o"
 	@echo "... test1.i"
 	@echo "... test1.s"
+	@echo "... util.o"
+	@echo "... util.i"
+	@echo "... util.s"
 .PHONY : help
 
 

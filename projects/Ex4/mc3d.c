@@ -77,7 +77,7 @@ int main(){
         posOld = posOld + h * (rand()/(double)RAND_MAX - 1.0/2.0); // add PosOld
         psiOld = PsiT(alpha[ii], posOld);
 
-        /* Monte Calro loop */
+        /* Monte Carlo loop */
         for (int mm = 0; mm < M; mm++)
         {
             posNew = posOld + h * (rand()/(double)RAND_MAX  - 1.0/2.0);
@@ -108,6 +108,10 @@ int main(){
         ENERGY[ii] = 3.0 * Energies[ii];
         VARIANCE[ii] = 3.0 * Variances[ii];
     }
+
+
+
+    
 
 /* Exact results from analytical calculations */
 /* Exploit isotropy of ho */
@@ -198,4 +202,5 @@ double normCalculator(double psi[], double dx, int dim){
 
     return norm * norm;
 }
+
 

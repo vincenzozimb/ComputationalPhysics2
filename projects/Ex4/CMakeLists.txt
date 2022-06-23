@@ -33,7 +33,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plot3d.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ###########################################################
-add_executable(mcel mcel.c )
+add_executable(mcel mcel.c util.c)
 
 target_compile_options(mcel PRIVATE -Wall -O3)
 find_package(GSL REQUIRED)
@@ -41,7 +41,7 @@ target_link_libraries(mcel m myfunc lapack GSL::gsl GSL::gslcblas)
 
 # add custom commands
 add_custom_target(run-ex4-mcel
-COMMAND mcel && gnuplot plotEl.gp
+COMMAND mcel #&& gnuplot plotEl.gp
 DEPENDS mcel 
 WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )

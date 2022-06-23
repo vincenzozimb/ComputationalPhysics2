@@ -67,7 +67,7 @@ include projects/Ex4/CMakeFiles/run-ex4-mcel.dir/compiler_depend.make
 include projects/Ex4/CMakeFiles/run-ex4-mcel.dir/progress.make
 
 projects/Ex4/CMakeFiles/run-ex4-mcel: projects/Ex4/mcel
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./mcel && gnuplot plotEl.gp
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./mcel
 
 run-ex4-mcel: projects/Ex4/CMakeFiles/run-ex4-mcel
 run-ex4-mcel: projects/Ex4/CMakeFiles/run-ex4-mcel.dir/build.make
