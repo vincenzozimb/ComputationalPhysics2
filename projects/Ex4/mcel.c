@@ -69,16 +69,14 @@ for (int jj = 0; jj < 4; jj++)
 /* Variational parameters */
 double eta[DIMe];
 double eta_init = 0.2;
-double eta_end = 1.5;
+double eta_end = 10.5;
 double deta = (eta_end - eta_init)/(DIMe);
 
 /* Energy and variance */
-double Etot_1 = 0.0;
-double Etot_2 = 0.0;
-double Etot2_1 = 0.0;
-double Etot2_2 = 0.0;
+double Etot_1 = 0.0, Etot_2 = 0.0;
+double Etot2_1 = 0.0, Etot2_2 = 0.0;
 double Var = 0.0;
-double dE_1, dE_2;
+double dE_1 = 0.0, dE_2 = 0.0;
 double Energies_1[DIMe];
 double Energies_2[DIMe];
 double Variances[DIMe];
@@ -112,6 +110,7 @@ int index;
 /* ------------------------------- EVOLUTION OF THE SYSTEM : 4 NON-INTERACTING ELECTRONS ------------------------------- */
 for (int ee = 0; ee < DIMe; ee++)
 {
+    printf("\nciclo : %d #####################################################\n", ee);
     eta[ee] = eta_init + ee * deta; // initialize variational parameters
 
     Etot_1 = 0.0; // initialize total energy at each cycle
@@ -129,11 +128,8 @@ for (int ee = 0; ee < DIMe; ee++)
         for (int jj = 0; jj < N2; jj++)
         {
             Xold[ii][jj] = h * (rand()/(double)RAND_MAX - 1.0/2.0);
-            //printf("%lf\t", Xold[ii][jj]);
         }
-        //printf("\n");
     }
-    //printf("\n");
 
     /* Calculation of r */
     for (int ii = 0; ii < N2; ii++)
@@ -143,31 +139,74 @@ for (int ee = 0; ee < DIMe; ee++)
     }
     
     /* Aup */
-    initialization_of_wf(Aup, Aup_inv, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xold);
+    // initialization_of_wf(Aup, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xold);
+    initialize_mat_contents(Aup, eta[ee], r, Xold);
     // printf("Aup\n");
     // print_mat_contents(Aup);
     // printf("\n");
-    // printf("GDratio_up\n");
+    gradient_of_matrix(gradAup_x, eta[ee], r, Xold, 0); 
+    // printf("gradAup_x\n");
+    // print_mat_contents(gradAup_x);
+    // printf("\n");
+    gradient_of_matrix(gradAup_y, eta[ee], r, Xold, 1); 
+    // printf("gradAup_y\n");
+    // print_mat_contents(gradAup_y);
+    // printf("\n");
+    gradient_of_matrix(gradAup_z, eta[ee], r, Xold, 2);
+    // printf("gradAup_z\n");
+    // print_mat_contents(gradAup_z);
+    // printf("\n");
+    laplacian_of_matrix(lapAup, eta[ee], r, Xold);
+    // printf("lapAup\n");
+    // print_mat_contents(lapAup);
+    // printf("\n");
+    // printf("\n");
+    Aup_inv = invert_a_matrix(Aup); // To do because it doesn't return the inverse matrix
+    // printf("Aup_inv\n");
+    // print_mat_contents(Aup_inv);
+    // printf("\n");
+    initialize_mat_contents(Aup, eta[ee], r, Xold); // To do because invert_a_matrix reverts the matrix Aup
+    GDtoDR_old(gradAup_x, gradAup_y, gradAup_z, Aup_inv, GDratio_up);
+    // printf("GDtoDR\n"); 
     // for (int ii = 0; ii < DIM; ii++)
     // {
-    //     for (int jj = 0; jj < N2; jj++)
-    //     {
-    //        printf("%lf\t", GDratio_up[ii][jj]);
-    //     }
-    //     printf("\n");
-        
+    //    for (int jj = 0; jj < N2; jj++)
+    //    {
+    //         printf("%lf\t", GDratio_up[ii][jj]);
+    //    }
+    //    printf("\n");
     // }
-    
+    // printf("\n");
+    LDtoDR(lapAup, Aup_inv, LDratio_up); // LDtoD ratio
+    // printf("LDtoDR\n"); 
+    // for (int ii = 0; ii < N2; ii++)
+    // {
+    //     printf("%lf\n",LDratio_up[ii] );
+    // }
+    // printf("\n");
+    detAup = determinant_of_matrix(Aup); // Slater determinant
+    // printf("detAup : %lf\n\n", detAup);
+    initialize_mat_contents(Aup, eta[ee], r, Xold); // Re-initialize m
     
     /* Adown */
-    initialization_of_wf(Adown, Adown_inv, gradAdown_x, gradAdown_y, gradAdown_z, lapAdown, GDratio_down, LDratio_down, detAdown, eta[ee], r, Xold);
-
+    // initialization_of_wf(Adown, gradAdown_x, gradAdown_y, gradAdown_z, lapAdown, GDratio_down, LDratio_down, detAdown, eta[ee], r, Xold);
+    initialize_mat_contents(Adown, eta[ee], r, Xold); //Initialize matrix Aup
+    gradient_of_matrix(gradAdown_x, eta[ee], r, Xold, 0); // Gradient of Adown - Adown_x
+    gradient_of_matrix(gradAdown_y, eta[ee], r, Xold, 1); // Gradient of Adown - Adown_y
+    gradient_of_matrix(gradAdown_z, eta[ee], r, Xold, 2); // Gradient of Adown - Adown_z
+    laplacian_of_matrix(lapAdown, eta[ee], r, Xold); // Laplacian of Adown
+    Adown_inv = invert_a_matrix(Adown); // Inverse of Adown
+    initialize_mat_contents(Adown, eta[ee], r, Xold); // Re-initialize Adown
+    GDtoDR_old(gradAdown_x,gradAdown_y, gradAdown_z, Adown_inv, GDratio_down); //GDtoD ratio
+    LDtoDR(lapAdown, Adown_inv, LDratio_down); // LDtoD ratio
+    detAdown = determinant_of_matrix(Adown); // Slater determinant
+    initialize_mat_contents(Adown, eta[ee], r, Xold); // Re-initialize Adown
     /* ################################################ Evolution ################################################# */
 
     psiOld = detAup * detAdown; // initial trial wave function with electrons in specific positions
 
-    srand(time(0));
-
+    srand(time(0)); 
+    
     /* ------------------------------------------------ Monte Carlo loop ------------------------------------------------*/
     for (int mm = 0; mm < M; mm++)
     {
@@ -189,20 +228,67 @@ for (int ee = 0; ee < DIMe; ee++)
                 }
     
             }    
+
+            // for(int ii = 0; ii< DIM; ii++){
+            //     for (int jj = 0; jj < N2; jj++)
+            //     {
+            //         printf("%lf\t", Xnew[ii][jj]);
+            //     }
+            //     printf("\n");
+            // }
+            // printf("\n");
             
         /*  Evaluation of wf in Xnew */
-        evolution_of_wf(Aup, Aup_inv, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xnew);
-        evolution_of_wf(Adown, Adown_inv, gradAdown_x, gradAdown_y, gradAdown_z, lapAdown, GDratio_down, LDratio_down, detAdown, eta[ee], r, Xold);
-
-        psiNew = detAup * detAdown;
-
-    
-        /* Metropolis test */
-        if (rand()/(double)RAND_MAX <= psiNew * psiNew/(psiOld * psiOld))
-        {
-           for (int ii = 0; ii < DIM; ii++)
+         // evolution_of_wf(Aup, Aup_inv, gradAup_x, gradAup_y, gradAup_z, lapAup, GDratio_up, LDratio_up, detAup, eta[ee], r, Xnew);
+        initialize_mat_contents(Aup, eta[ee], r, Xnew); //Initialize matrix Aup
+        gradient_of_matrix(gradAup_x, eta[ee], r, Xnew, 0); 
+        gradient_of_matrix(gradAup_y, eta[ee], r, Xnew, 1); 
+        gradient_of_matrix(gradAup_z, eta[ee], r, Xnew, 2); 
+        laplacian_of_matrix(lapAup, eta[ee], r, Xnew); 
+        Aup_inv = invert_a_matrix(Aup); 
+        initialize_mat_contents(Aup, eta[ee], r, Xnew); 
+        GDtoDR_new(Aup, gradAup_x,gradAup_y, gradAup_z, Aup_inv, GDratio_up); 
+             printf("GDtoDR\n"); 
+            for (int ii = 0; ii < DIM; ii++)
             {
                 for (int jj = 0; jj < N2; jj++)
+                {
+                        printf("%lf\t", GDratio_up[ii][jj]);
+                }
+                printf("\n");
+            }
+             printf("\n");
+        LDtoDR(lapAup, Aup_inv, LDratio_up); 
+            printf("LDtoDR\n"); 
+            for (int ii = 0; ii < N2; ii++)
+            {
+                printf("%lf\n",LDratio_up[ii] );
+            }
+            printf("\n");
+        detAup = determinant_of_matrix(Aup); 
+        initialize_mat_contents(Aup, eta[ee], r, Xnew); 
+        initialize_mat_contents(Adown, eta[ee], r, Xnew); //Initialize matrix Aup
+        gradient_of_matrix(gradAdown_x, eta[ee], r, Xnew, 0); // Gradient of Adown - Adown_x
+        gradient_of_matrix(gradAdown_y, eta[ee], r, Xnew, 1); // Gradient of Adown - Adown_y
+        gradient_of_matrix(gradAdown_z, eta[ee], r, Xnew, 2); // Gradient of Adown - Adown_z
+        laplacian_of_matrix(lapAdown, eta[ee], r, Xnew); // Laplacian of Adown
+        Adown_inv = invert_a_matrix(Adown); // Inverse of Adown
+        initialize_mat_contents(Adown, eta[ee], r, Xnew); // Re-initialize Adown
+        GDtoDR_new(Adown, gradAdown_x,gradAdown_y, gradAdown_z, Adown_inv, GDratio_down); 
+        LDtoDR(lapAdown, Adown_inv, LDratio_down); // LDtoD ratio
+        detAdown = determinant_of_matrix(Adown); // Slater determinant
+        initialize_mat_contents(Adown, eta[ee], r, Xnew); // Re-initialize Adown
+        
+        psiNew = detAup * detAdown;
+        // printf("psiNew: %lf\n", psiNew);
+        /* Metropolis test */
+        // printf("rand\t\t psiNew/psiOld\n");
+        if (rand()/(double)RAND_MAX <= psiNew * psiNew/(psiOld * psiOld))
+        {   
+            // printf("%lf\t %lf\n", rand()/(double)RAND_MAX, psiNew * psiNew/(psiOld * psiOld) );
+           for (int ii = 0; ii < DIM; ii++)
+            {
+                for (int jj = 0; jj < N2; jj++) // Update positions
                 {
                     if (jj == index)
                     {
@@ -214,13 +300,20 @@ for (int ee = 0; ee < DIMe; ee++)
                 }
     
             }    
-            psiOld = psiNew; // Updated wave function
+            psiOld = psiNew; // Update wave function
+            // printf("psiOld: %lf\n", psiOld);
+            // printf("mm: %d\t 1\n", mm);
+        // } else { printf("mm: %d\t 0\n", mm);
         }
+
 
         /* Compute local energy */
         // avoided thermalisation
-        dE_1 = localEnergy1( LDratio_up, LDratio_down); 
-        dE_2 = localEnergy2( LDratio_up, LDratio_down, GDratio_up, GDratio_down );
+
+        // control local energy anf GD and LD ratios (there should be a dependence on the old position )
+
+        dE_1 = localEnergy1(LDratio_up, LDratio_down); 
+        dE_2 = localEnergy2(LDratio_up, LDratio_down, GDratio_up, GDratio_down );
         Etot_1 += dE_1;
         Etot_2 += dE_2;
         Etot2_1 += dE_1 * dE_1;

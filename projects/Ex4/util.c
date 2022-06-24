@@ -42,7 +42,7 @@ void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[4], double
     
 }
 
-gsl_matrix * invert_a_matrix(gsl_matrix *matrix)
+gsl_matrix *invert_a_matrix(gsl_matrix *matrix)
 {   /* returns the inverse of the input matrix */
     gsl_permutation *p = gsl_permutation_alloc(size);
     int s;
@@ -106,7 +106,7 @@ int randomGenerator(int low, int up){
 
 void gradient_of_matrix(gsl_matrix *matrix, double eta, double r[4], double R[3][4], int component)
 {   /* Calculates one component of the gradient of the matrix */
-    double val;
+    double val = 0.0;
 
     for (size_t jj = 0; jj < size; jj++) // run over columns : electrons
     {
@@ -114,10 +114,10 @@ void gradient_of_matrix(gsl_matrix *matrix, double eta, double r[4], double R[3]
         {
             if (jj == 0 )
             {
-                val = - R[component][ii] / (eta * eta) * Psi0(eta, r[jj]);
+                val = - R[component][ii] / (eta * eta) * Psi0(eta, r[ii]);
                 gsl_matrix_set(matrix, ii, jj, val);
             } else {
-                val = (1.0 - (R[component][ii] * R[component][ii])  / (eta * eta)) * Psi0(eta, r[jj]);
+                val = (1.0 - (R[component][ii] * R[component][ii])  / (eta * eta)) * Psi0(eta, r[ii]);
                 gsl_matrix_set(matrix, ii, jj, val);
             }
             
@@ -128,22 +128,22 @@ void gradient_of_matrix(gsl_matrix *matrix, double eta, double r[4], double R[3]
     
 void laplacian_of_matrix(gsl_matrix *matrix, double eta, double r[4], double R[3][4] )
 {   /* Calculated the laplacian of the matrix */
-    double val = 0.0;
+    double val;
     for (size_t jj = 0; jj < size; jj++)
-    {
+    {   
         for (size_t ii = 0; ii < size; ii++)
-        {
+        {   val = 0.0;
             if (jj == 0)
             {
                 for (int cc = 0; cc < DIM; cc++)
                 {
-                    val += pow(R[cc][ii]/ (eta * eta), 2.0) * Psi0(eta, r[jj]);
+                    val += (- 1.0 / (eta * eta) + pow(R[cc][ii]/ (eta * eta), 2.0)) * Psi0(eta, r[ii]);
                     gsl_matrix_set(matrix, ii, jj, val);
                 } 
             } else {
                 for (int cc = 0; cc < DIM; cc++)
                 {
-                    val += (- R[cc][ii]- 2.0 + R[cc][ii] * R[cc][ii] / (eta * eta)) * R[cc][ii]/(eta * eta) * Psi0(eta, r[jj]);
+                    val += ( -3.0 * R[cc][ii] / (eta * eta) + pow(R[cc][ii] , 3.0 )/ pow(eta, 4.0 ) ) * Psi0(eta, r[ii]);
                     gsl_matrix_set(matrix, ii, jj, val);
                 }
     
@@ -166,9 +166,6 @@ void GDtoDR_old(gsl_matrix *m1, gsl_matrix *m2, gsl_matrix *m3 , gsl_matrix *det
                 GDratio[1][ii] += gsl_matrix_get(m2, ii, jj) * gsl_matrix_get(detInv, ii, jj ); // y-component
                 GDratio[2][ii] += gsl_matrix_get(m3, ii, jj) * gsl_matrix_get(detInv, ii, jj ); // z-component
             }
-        // gsl_matrix_set(GDratio, 0, ii, val[0][ii]);
-        // gsl_matrix_set(GDratio, 1, ii, val[1][ii]);
-        // gsl_matrix_set(GDratio, 2, ii, val[2][ii]);
     }
 
 }
@@ -207,8 +204,9 @@ void LDtoDR(gsl_matrix *mm, gsl_matrix *detInv, double LDratio[N2])
     
 }
 
-void initialization_of_wf(gsl_matrix *m, gsl_matrix *inv_m, gsl_matrix *gm_x, gsl_matrix *gm_y, gsl_matrix *gm_z, gsl_matrix *lm, double GDrat[DIM][N2] , double LDrat[4], double detm, double eta, double r[4], double R[3][4])
+void initialization_of_wf(gsl_matrix *m, gsl_matrix *gm_x, gsl_matrix *gm_y, gsl_matrix *gm_z, gsl_matrix *lm, double GDrat[DIM][N2] , double LDrat[4], double detm, double eta, double r[4], double R[3][4])
 {
+    gsl_matrix *inv_m;
     initialize_mat_contents(m, eta, r, R); //Initialize matrix m
     gradient_of_matrix(gm_x, eta, r, R, 0); // Gradient of m - gm_x
     gradient_of_matrix(gm_y, eta, r, R, 1); // Gradient of m - gm_y
@@ -219,9 +217,11 @@ void initialization_of_wf(gsl_matrix *m, gsl_matrix *inv_m, gsl_matrix *gm_x, gs
     GDtoDR_old(gm_x, gm_y, gm_z, inv_m, GDrat); 
     LDtoDR(lm, inv_m, LDrat); // LDtoD ratio
     detm = determinant_of_matrix(m); // Slater determinant
+    initialize_mat_contents(m, eta, r, R); // Re-initialize m
 }
 
-void evolution_of_wf(gsl_matrix *m, gsl_matrix *inv_m, gsl_matrix *gm_x, gsl_matrix *gm_y, gsl_matrix *gm_z, gsl_matrix *lm, double GDrat[DIM][N2] , double LDrat[4], double detm, double eta, double r[4], double R[3][4]){
+void evolution_of_wf(gsl_matrix *m, gsl_matrix *inv_m, gsl_matrix *gm_x, gsl_matrix *gm_y, gsl_matrix *gm_z, gsl_matrix *lm, double GDrat[DIM][N2] , double LDrat[4], double detm, double eta, double r[4], double R[3][4])
+{
     
     initialize_mat_contents(m, eta, r, R); //Initialize matrix m
     gradient_of_matrix(gm_x, eta, r, R, 0); // Gradient of m - gm_x
@@ -233,6 +233,7 @@ void evolution_of_wf(gsl_matrix *m, gsl_matrix *inv_m, gsl_matrix *gm_x, gsl_mat
     GDtoDR_new(m, gm_x, gm_y, gm_z, inv_m, GDrat); 
     LDtoDR(lm, inv_m, LDrat); // LDtoD ratio
     detm = determinant_of_matrix(m); // Slater determinant
+    initialize_mat_contents(m, eta, r, R);
 }
 
 double localEnergy1( double LDtoDRup[N2], double LDtoDRdown[N2])

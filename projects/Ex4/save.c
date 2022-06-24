@@ -199,37 +199,79 @@ return detMat;
 
 
     initialize_mat_contents(Aup, eta[ee], r, Xold); //Initialize matrix Aup
-    // // printf("Aup:\n");
-    // // print_mat_contents(Aup);
-    // // printf("\n");
+    // printf("Aup:\n");
+    // print_mat_contents(Aup);
+    // printf("\n");
 
-    // gradient_of_matrix(gradAup_x, eta[ee], r, Xold, 0); // Gradient of Aup - grAup_x
-    // // printf("gradAupx:\n");
-    // // print_mat_contents(gradAup_x);
-    // // printf("\n"); 
-    // gradient_of_matrix(gradAup_y, eta[ee], r, Xold, 1); // Gradient of Aup - grAup_y
-    // gradient_of_matrix(gradAup_z, eta[ee], r, Xold, 2); // Gradient of Aup - grAup_z
+    gradient_of_matrix(gradAup_x, eta[ee], r, Xold, 0); // Gradient of Aup - grAup_x
+    // printf("gradAupx:\n");
+    // print_mat_contents(gradAup_x);
+    // printf("\n"); 
+    gradient_of_matrix(gradAup_y, eta[ee], r, Xold, 1); // Gradient of Aup - grAup_y
+    gradient_of_matrix(gradAup_z, eta[ee], r, Xold, 2); // Gradient of Aup - grAup_z
 
-    // laplacian_of_matrix(lapAup, eta[ee], r, Xold); // Laplacian of Aup
-    // // printf("lapAup: \n");
-    // // print_mat_contents(lapAup);
-    // // printf("\n");
+    laplacian_of_matrix(lapAup, eta[ee], r, Xold); // Laplacian of Aup
+    // printf("lapAup: \n");
+    // print_mat_contents(lapAup);
+    // printf("\n");
 
-    // Aup_inv = invert_a_matrix(Aup); // Inverse of Aup
+    Aup_inv = invert_a_matrix(Aup); // Inverse of Aup
 
-    // initialize_mat_contents(Aup, eta[ee], r, Xold); // Re-initialize Aup
+    initialize_mat_contents(Aup, eta[ee], r, Xold); // Re-initialize Aup
 
-    // GDtoDR_old(gradAup_x,gradAup_y, gradAup_z, Aup_inv, GDratio_up); // GDtoD ratio
-    // // printf("GDtoDR_old: \n"); 
-    // // print_mat_contents2(GDratio_up);
-    // // printf("\n");
+    GDtoDR_old(gradAup_x,gradAup_y, gradAup_z, Aup_inv, GDratio_up); // GDtoD ratio
+    // printf("GDtoDR_old: \n"); 
+    // print_mat_contents2(GDratio_up);
+    // printf("\n");
 
-    // LDtoDR(lapAup, Aup_inv, LDratio_up); // LDtoD ratio
-    // // for (int ii = 0; ii < N2; ii++)
-    // // {
-    // //     printf("LDratio[%d] =%lf\t", ii, LDratio_up[ii]);
-    // // }
-    // // printf("\n");
+    LDtoDR(lapAup, Aup_inv, LDratio_up); // LDtoD ratio
+    // for (int ii = 0; ii < N2; ii++)
+    // {
+    //     printf("LDratio[%d] =%lf\t", ii, LDratio_up[ii]);
+    // }
+    // printf("\n");
 
-    // detAup = determinant_of_matrix(Aup); // Slater determinant
-    // //printf("det initial : %lf\n", detAup);
+    detAup = determinant_of_matrix(Aup); // Slater determinant
+    //printf("det initial : %lf\n", detAup);
+
+
+
+    printf("Adown\n");
+    print_mat_contents(Adown);
+    printf("\n");
+    printf("gradAdown_x\n");
+    print_mat_contents(gradAdown_x);
+    printf("\n");
+    printf("gradAup_y\n");
+    print_mat_contents(gradAup_y);
+    printf("\n");
+    printf("gradAup_z\n");
+    print_mat_contents(gradAup_z);
+    printf("\n");
+    printf("lapAdown\n");
+    print_mat_contents(lapAdown);
+    printf("\n");
+    printf("\n");
+    Adown_inv = invert_a_matrix(Adown); // To do because it doesn't return the inverse matrix
+    printf("Adown_inv\n");
+    print_mat_contents(Adown_inv);
+    printf("\n");
+    initialize_mat_contents(Adown, eta[ee], r, Xold); // To do because invert_a_matrix changes the matrix Aup
+    printf("GDtoDR\n"); 
+    for (int ii = 0; ii < DIM; ii++)
+    {
+       for (int jj = 0; jj < N2; jj++)
+       {
+            printf("%lf\t", GDratio_down[ii][jj]);
+       }
+       printf("\n");
+    }
+    printf("\n");
+    printf("LDtoDR\n"); 
+    for (int ii = 0; ii < N2; ii++)
+    {
+        printf("%lf\n",LDratio_down[ii] );
+    }
+    printf("\n");
+    printf("detAdown : %lf\n\n", detAdown);
+    initialize_mat_contents(Adown, eta[ee], r, Xold); // Re-initialize m
