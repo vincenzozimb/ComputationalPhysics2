@@ -24,8 +24,8 @@ double normCalculator(double psi[], double dx, int dim);
 int main(){
     
 /* Space parameters */
-    double L = 20.0; // cube
-    double h = L / (DIMx - 1.0);
+    double L = 10.0; // cube
+    double h = L / (DIMx -1);
     double posOld = -L/2.0;
     double posNew = -L/2.0;
     double x[DIMx];
@@ -49,8 +49,8 @@ int main(){
     double alpha_init = 0.3;
     double alpha_end = 3.0;
 
-    double dalpha = (alpha_end - alpha_init)/(DIMa - 1.0);
-    printf("dalpha = %lf\n", dalpha);   
+    double dalpha = (alpha_end - alpha_init)/(DIMa);
+   // printf("dalpha = %lf\n", dalpha);   
     double alpha[DIMa];
     
 /* Wave functions */
@@ -73,6 +73,7 @@ int main(){
         
         Etot = 0.0; 
         Etot2 = 0.0;
+        Var = 0.0;
 
         posOld = posOld + h * (rand()/(double)RAND_MAX - 1.0/2.0); // add PosOld
         psiOld = PsiT(alpha[ii], posOld);
@@ -97,7 +98,7 @@ int main(){
         /* Compute local energy */
         Etot /= M;
         Etot2 /= M;
-        Var = Etot2 - Etot *Etot;
+        Var = (Etot2 - Etot *Etot);
         Energies[ii] = Etot;
         Variances[ii] = Var;
     }
@@ -107,6 +108,7 @@ int main(){
     {  
         ENERGY[ii] = 3.0 * Energies[ii];
         VARIANCE[ii] = 3.0 * Variances[ii];
+        printf("alpha: %lf\t var[%d] = %lf\n", alpha[ii] , ii, VARIANCE[ii]);
     }
 
 
@@ -121,6 +123,7 @@ double norm[DIMa];
 double El[DIMx][DIMa];
 double p[DIMx][DIMa];
 double Etot_ex[DIMa];
+double Etot2_ex[DIMa];
 double Var_ex[DIMa];
 
     // for (int jj = 0; jj < DIMa; jj++)
@@ -147,6 +150,8 @@ double Var_ex[DIMa];
     for (int ii = 0; ii < DIMa; ii++)
     {
         Etot_ex[ii] = 3.0/4.0 * (alpha[ii]* alpha[ii] + 1.0 / (alpha[ii] * alpha[ii]));
+        Etot2_ex[ii] = 9.0/4.0 + 15.0/16.0 * pow(pow(alpha[ii], 4.0) -1.0, 2.0) / pow(alpha[ii], 4.0);
+        Var_ex[ii] = Etot2_ex[ii] - Etot_ex[ii] * Etot_ex[ii];
     }
 
 /* Print data on file */

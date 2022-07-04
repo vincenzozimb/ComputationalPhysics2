@@ -23,9 +23,8 @@ double r_up[N2], r_down[N2], r2_up[N2], r2_down[N2];
 
 /* Variational parameters */
 double eta[DIMe];
-double eta_init = 1.5;
-double eta_end = 5.0;
-double delta = 1.5 ; // parameter in the update of positions 
+double eta_init = 2.0;
+double eta_end = 6.0;
 double deta = (eta_end - eta_init)/(DIMe);
 
 /* Energy */
@@ -70,36 +69,16 @@ int cont = 0;
 int b = 0;
 int index;
 
+double delta = 1.5 ; // parameter in the update of positions 
 
 srand(time(0)); // just call once to randomize the seed
 
 /* Initial trial positions */
-    // for (int jj = 0; jj < N; jj++) // columns : run over electrons
-    // {
-    //     for (int ii = 0; ii < DIM; ii++) // rows : run over components (x,y,z)
-    //     {
-    //         Xold[ii][jj] = randomGenerator_int(0, delta); // - delta * (rand()/(double)RAND_MAX - 1.0/2.0);
-    //         if (jj < 4)
-    //         {
-    //             Xold_up[ii][jj] = Xold[ii][jj];
-    //         } else {
-    //             Xold_down[ii][jj-4] = Xold[ii][jj];
-    //         }
-            
-    //     }
-    // }
-    Xold[0][0] = 0.0;   Xold[1][0] = 1.0; Xold[2][0] = 0.0;
-    Xold[0][1] = 0.0;   Xold[1][1] = 1.0; Xold[2][1] = 1.0;
-    Xold[0][2] = 1.0;   Xold[1][2] = 1.0; Xold[2][2] = 2.0;
-    Xold[0][3] = 1.0;   Xold[1][3] = 2.0; Xold[2][3] = 1.0;
-    Xold[0][4] = 0.0;   Xold[1][4] = 0.0; Xold[2][4] = 0.0;
-    Xold[0][5] = 2.0;   Xold[1][5] = 1.0; Xold[2][5] = 0.0;
-    Xold[0][6] = 0.0;   Xold[1][6] = 2.0; Xold[2][6] = 0.0;
-    Xold[0][7] = 2.0;   Xold[1][7] = 1.0; Xold[2][7] = 2.0;
-    for (int jj = 0; jj < N; jj++)
+    for (int jj = 0; jj < N; jj++) // columns : run over electrons
     {
-        for (int ii = 0; ii < DIM; ii++)
+        for (int ii = 0; ii < DIM; ii++) // rows : run over components (x,y,z)
         {
+            Xold[ii][jj] = randomGenerator_int(0, delta); // - delta * (rand()/(double)RAND_MAX - 1.0/2.0);
             if (jj < 4)
             {
                 Xold_up[ii][jj] = Xold[ii][jj];
@@ -108,8 +87,17 @@ srand(time(0)); // just call once to randomize the seed
             }
             
         }
-        
     }
+    // printf("Xold: \n");
+    // for (int ii = 0; ii < DIM; ii++)
+    // {
+    //     for (int jj = 0; jj < N; jj++)
+    //     {
+    //         printf("%lf\t", Xold[ii][jj]);
+    //     }
+    //     printf("\n");
+    // }
+    
 
     for (int jj = 0; jj < N2; jj++)
     {
@@ -142,17 +130,17 @@ for (int ee = 0; ee < DIMe; ee++)
 
 /* Initial trial wave function */
     psiOld = detAup * detAdown; 
-
+    // printf("psiOld: %lf\t", psiOld);
   
     /* ------------------------------------------------ Monte Carlo loop ------------------------------------------------*/
 for (int mm = 0; mm < M + thermal; mm++){
     b = 0;
-    
     /* Select one of the 8 electrons randomly */
-    index = randomGenerator_int(0 , N-1); // take the evolving electron in a random way 
+     index = randomGenerator_int(0 , N-1); // take the evolving electron in a random way 
 
     /* Update the position of that electron and r */
-        for (int jj = 0; jj< N; jj++)
+    
+    for (int jj = 0; jj< N; jj++)
     {
         for (int ii = 0; ii < DIM; ii++)
         {
@@ -172,7 +160,15 @@ for (int mm = 0; mm < M + thermal; mm++){
         }
         
     }
-
+    // printf("Xnew: \n");
+    // for (int ii = 0; ii < DIM; ii++)
+    // {
+    //     for (int jj = 0; jj < N; jj++)
+    //     {
+    //         printf("%lf\t", Xnew[ii][jj]);
+    //     }
+    //     printf("\n");
+    // }
     for (int jj = 0; jj < N2; jj++)
     {
         r2_up[jj] = Xnew_up[0][jj] * Xnew_up[0][jj] + Xnew_up[1][jj] * Xnew_up[1][jj] + Xnew_up[2][jj] * Xnew_up[2][jj];
@@ -189,19 +185,18 @@ for (int mm = 0; mm < M + thermal; mm++){
     init_Slater_matrices(Aup, Adown, eta[ee], r_up, r_down, Xnew_up, Xnew_down); // re-initialize
 
     psiNew = detAup * detAdown;
+    //printf("% d\t psiNew: %lf\n", mm ,psiNew);
     
     // printf("dAu:%lf\t dAd: %lf\t dAuO: %lf\t dAdO: %lf\t Rsd: %lf\n", R_sd, detAup, detAdown, detAup_old, detAdown_old);
     /* Metropolis test*/
     double w, random; // acceptance ratio
     w = psiNew * psiNew/(psiOld * psiOld);
     random =  rand()/(double) RAND_MAX;
-    //printf("psiOld: %lf\t psiNew: %lf\n", psiOld, psiNew);
-    //printf("w: %lf\n", w);
-    //printf("rand: %lf\n", random);
     if ( random <= w )
     {
          // printf("rand: %lf\t psiN/psiO: %lf\t", random, psiNew * psiNew/(psiOld * psiOld) );
         /* Update positions (new become old) and r */ 
+       
         for (int jj = 0; jj < N; jj++)
         {
             for (int ii = 0; ii < DIM; ii++)
@@ -209,14 +204,13 @@ for (int mm = 0; mm < M + thermal; mm++){
                Xold[ii][jj] = Xnew[ii][jj];
                if (jj < 4)
                 {
-                    Xold_up[ii][jj] = Xnew[ii][jj];
+                    Xold_up[ii][jj] = Xold[ii][jj];
                 } else {
-                    Xold_down[ii][jj-4] = Xnew[ii][jj];
+                    Xold_down[ii][jj-4] = Xold[ii][jj];
                 }
             }
             
         }
-
         for (int jj = 0; jj < N2; jj++)
         {
             r2_up[jj] = Xold_up[0][jj] * Xold_up[0][jj] + Xold_up[1][jj] * Xold_up[1][jj] + Xold_up[2][jj] * Xold_up[2][jj];
@@ -233,7 +227,7 @@ for (int mm = 0; mm < M + thermal; mm++){
     }
 
     /* Compute the local energy */
-    if (mm >= thermal)
+    if (mm > thermal)
     {
             /* Gradient of matrices Aup and Adown */
             /* Component x */
@@ -259,36 +253,21 @@ for (int mm = 0; mm < M + thermal; mm++){
         GDtoDR( gradAdown_x, gradAdown_y, gradAdown_z, Adown_inv, GDratio_down);
       
         LDtoDR(lapAup, Aup_inv, LDratio_up); 
-        // printf("LDtoDR_up :\n"); 
-        // for (int ii = 0; ii < N2; ii++)
-        // {
-        //     printf("%lf\t",LDratio_up[ii] );
-        // }
-        // printf("\n");
         LDtoDR(lapAdown, Adown_inv, LDratio_down); 
-        // printf("LDtoDR_down :\n"); 
-        // for (int ii = 0; ii < N2; ii++)
-        // {
-        //     printf("%lf\t",LDratio_down[ii] );
-        // }
-        // printf("\n");
 
-
-        dE_1 = localEnergy1(LDratio_up  , LDratio_down);
+        dE_1 = localEnergy1(LDratio_up, LDratio_down);
         // dE_1 = -1.0/2.0 * (LDratio_up[0] + LDratio_down[0] + LDratio_up[1] + LDratio_down[1] + LDratio_up[2] + LDratio_down[2] + LDratio_up[3] + LDratio_down[3] );
-        printf("dE1: %lf\n", dE_1);
         dE_2 = localEnergy2(LDratio_up, LDratio_down, GDratio_up, GDratio_down );
         // printf("%d\tdE2: %lf\n", mm ,dE_2);
         Etot_1 += dE_1;
         Etot_2 += dE_2;
-        printf("Etot_1: %lf\t Etot_2: %lf\n", Etot_1, Etot_2);
         Etot2_1 += dE_1 * dE_1;
         Etot2_2 += dE_2 * dE_2;
 
     }
 }
- printf("cont: %d\n", cont-thermal);
- printf("Accept. prob: %lf\n", (double)cont/(M+thermal));
+ //printf("cont: %d\n", cont-thermal);
+ // printf("Accept. prob: %lf\n", (double)cont/(M+thermal));
 Etot_1 /= M;
 Etot2_1 /= M;
 Etot_2 /= M;
@@ -407,13 +386,41 @@ gsl_matrix_free(lapAup);    gsl_matrix_free(lapAdown);
 //     }
 //     printf("\n");
 //     LDtoDR(lapAdown, Adown_inv, LDratio_down); // LDtoD ratio
-    // printf("LDtoDR_down :\n"); 
-    // for (int ii = 0; ii < N2; ii++)
-    // {
-    //     printf("%lf\n",LDratio_down[ii] );
-    // }
-    // printf("\n");
+//     printf("LDtoDR_down :\n"); 
+//     for (int ii = 0; ii < N2; ii++)
+//     {
+//         printf("%lf\n",LDratio_down[ii] );
+//     }
+//     printf("\n");
 
 }
 
 
+for (int jj = 0; jj< N; jj++)
+    {
+        for (int ii = 0; ii < DIM; ii++)
+        {
+        
+            Xnew[ii][jj] = Xold[ii][jj] + delta * (rand()/(double)RAND_MAX - 1.0/2.0);
+            if (jj < 4)
+            {
+                Xnew_up[ii][jj] = Xnew[ii][jj];
+            } else {
+                Xnew_down[ii][jj-4] = Xnew[ii][jj];
+            }
+        
+        }
+        
+    }
+
+
+
+    double localEnergy1( double LDtoDRup[N2], double LDtoDRdown[N2]){
+    /* First way to implement the calculation of the local kinetic energy */
+   double val = 0.0;
+    for (int ii = 0; ii < N2; ii++)
+    {
+        val += LDtoDRup[ii] + LDtoDRdown[ii] ;
+    }
+    return -1.0/2.0 * val;
+}

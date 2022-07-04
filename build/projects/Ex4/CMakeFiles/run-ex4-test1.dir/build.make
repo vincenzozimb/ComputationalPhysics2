@@ -67,7 +67,7 @@ include projects/Ex4/CMakeFiles/run-ex4-test1.dir/compiler_depend.make
 include projects/Ex4/CMakeFiles/run-ex4-test1.dir/progress.make
 
 projects/Ex4/CMakeFiles/run-ex4-test1: projects/Ex4/test1
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./test1
+	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/projects/Ex4 && ./test1 && gnuplot plotEL.gp
 
 run-ex4-test1: projects/Ex4/CMakeFiles/run-ex4-test1
 run-ex4-test1: projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make

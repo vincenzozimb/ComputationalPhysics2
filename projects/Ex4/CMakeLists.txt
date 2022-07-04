@@ -41,7 +41,7 @@ target_link_libraries(mcel m myfunc lapack GSL::gsl GSL::gslcblas)
 
 # add custom commands
 add_custom_target(run-ex4-mcel
-COMMAND mcel #&& gnuplot plotEl.gp
+COMMAND mcel && gnuplot plotEl.gp
 DEPENDS mcel 
 WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
@@ -58,7 +58,7 @@ target_link_libraries(test1 m myfunc lapack GSL::gsl GSL::gslcblas)
 
 # add custom commands
 add_custom_target(run-ex4-test1
-COMMAND test1 #&& gnuplot plotEL.gp
+COMMAND test1 && gnuplot plotEL.gp
 DEPENDS test1 
 WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 )
