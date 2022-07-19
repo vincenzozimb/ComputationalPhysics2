@@ -351,32 +351,6 @@ dft8/fast:
 .PHONY : dft8/fast
 
 #=============================================================================
-# Target rules for targets named run-ex4-test1
-
-# Build rule for target.
-run-ex4-test1: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run-ex4-test1
-.PHONY : run-ex4-test1
-
-# fast build rule for target.
-run-ex4-test1/fast:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/build
-.PHONY : run-ex4-test1/fast
-
-#=============================================================================
-# Target rules for targets named test1
-
-# Build rule for target.
-test1: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test1
-.PHONY : test1
-
-# fast build rule for target.
-test1/fast:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/build
-.PHONY : test1/fast
-
-#=============================================================================
 # Target rules for targets named mcel
 
 # Build rule for target.
@@ -473,7 +447,6 @@ help:
 	@echo "... run-ex4-mc1d"
 	@echo "... run-ex4-mc3d"
 	@echo "... run-ex4-mcel"
-	@echo "... run-ex4-test1"
 	@echo "... run-test"
 	@echo "... bessel_test"
 	@echo "... bound1d"
@@ -487,7 +460,6 @@ help:
 	@echo "... myfunc"
 	@echo "... scatt"
 	@echo "... test"
-	@echo "... test1"
 .PHONY : help
 
 

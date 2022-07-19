@@ -11,48 +11,35 @@
 
 /* ======================= FUNCTION BODIES ======================= */
 
-double Vext(double r, double R, double rho)
+double Vext(double rUp[N2], double rDown[N2], double R, double rho)
 {   /* External potential */
     double a = 2.0 * M_PI * rho;
-    if (r <= R)
+    double pot = 0.0;
+
+    for (int jj = 0; jj < N; jj++)
     {
-        return a * (r * r/3.0 - R * R);
-    } else {
-        return a * -2.0/3.0 * R * R * R/r;
-    
-    }
-    
-}
-
-void init_positions(double mat[DIM][N]){
-    /* Initialize matrix by hand */
-    mat[0][0] = 0.0;   mat[1][0] = 1.0; mat[2][0] = 0.0;
-    mat[0][1] = 0.0;   mat[1][1] = 1.0; mat[2][1] = 1.0;
-    mat[0][2] = 1.0;   mat[1][2] = 1.0; mat[2][2] = 2.0;
-    mat[0][3] = 1.0;   mat[1][3] = 2.0; mat[2][3] = 1.0;
-    mat[0][4] = 0.0;   mat[1][4] = 0.0; mat[2][4] = 0.0;
-    mat[0][5] = 2.0;   mat[1][5] = 1.0; mat[2][5] = 0.0;
-    mat[0][6] = 0.0;   mat[1][6] = 2.0; mat[2][6] = 0.0;
-    mat[0][7] = 2.0;   mat[1][7] = 1.0; mat[2][7] = 2.0;
-
-}
-
-void create_submat_and_r(double mat[DIM][N], double mat_up[DIM][N2], double mat_down[DIM][N2], double r_up[N2], double r_down[N2]){
-/* Create X_old and X_new matrices*/
-    for (int jj = 0; jj < N; jj++){
-        for (int ii = 0; ii < DIM; ii++){
-            if (jj < 4){
-                mat_up[ii][jj] = mat[ii][jj];
+        if (jj < N2)
+        {
+            if (rUp[jj] < R)
+            {
+                pot += a * (rUp[jj] * rUp[jj]/3.0 - R * R);
             } else {
-                mat_down[ii][jj-4] = mat[ii][jj];
+                pot += a * -2.0/3.0 * R * R * R/rUp[jj];
             }
+            
+        } else {
+            if (rDown[jj-4] < R)
+            {
+                pot += a * (rDown[jj-4] * rDown[jj-4]/3.0 - R * R);
+            } else {
+                pot += a * -2.0/3.0 * R * R * R/rDown[jj-4];
+            }
+            
         }
+        
     }
-    /* Create r*/
-    for (int jj = 0; jj < N2; jj++){
-        r_up[jj] = sqrt( mat_up[0][jj] * mat_up[0][jj] + mat_up[1][jj] * mat_up[1][jj] + mat_up[2][jj] * mat_up[2][jj] );
-        r_down[jj] = sqrt( mat_down[0][jj] * mat_down[0][jj] + mat_down[1][jj] * mat_down[1][jj] + mat_down[2][jj] * mat_down[2][jj] );
-    }
+    return pot;
+    
 }
 
 void print_matN(double mat[DIM][N]){
@@ -89,6 +76,38 @@ void print_vecN2(double vec[N2]){
     
 }
 
+// -----------------------------------------------------------------------------------
+void init_positions(double mat[DIM][N], double delta){
+
+    for (int ii = 0; ii < DIM; ii++)
+    {
+        for (int jj = 0; jj < N; jj++)
+        {
+            mat[ii][jj] = delta * (rand()/(double)RAND_MAX - 1.0/2.0);
+        }
+        
+    }
+    
+}
+
+void create_submat_and_r(double mat[DIM][N], double mat_up[DIM][N2], double mat_down[DIM][N2], double r_up[N2], double r_down[N2]){
+/* Create X_old and X_new matrices*/
+    for (int jj = 0; jj < N; jj++){
+        for (int ii = 0; ii < DIM; ii++){
+            if (jj < 4){
+                mat_up[ii][jj] = mat[ii][jj];
+            } else {
+                mat_down[ii][jj-4] = mat[ii][jj];
+            }
+        }
+    }
+    /* Create r*/
+    for (int jj = 0; jj < N2; jj++){
+        r_up[jj] = sqrt( mat_up[0][jj] * mat_up[0][jj] + mat_up[1][jj] * mat_up[1][jj] + mat_up[2][jj] * mat_up[2][jj] );
+        r_down[jj] = sqrt( mat_down[0][jj] * mat_down[0][jj] + mat_down[1][jj] * mat_down[1][jj] + mat_down[2][jj] * mat_down[2][jj] );
+    }
+}
+
 double Psi0(double eta, double r){
     /* wave function for orbital s */
     return  exp(-r * r /(2.0 * eta * eta));
@@ -99,25 +118,90 @@ double Psi1(double eta, double r, double x){
     return x * exp(-r * r /(2.0 * eta * eta));
 }
 
+double orbital(double R[DIM][N2], double r[N2], double eta, int ii, int jj){
+// jj -> column : orbital / electron
+// ii -> row : electron position
+    if (jj == 0){
+        return Psi0(eta, r[ii]);
+    } else {
+        return Psi1(eta, r[ii], R[jj-1][ii]);
+    }
+    
+}
+
 void initialize_mat_contents(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2]){
     /* initialize Slater determinant matrix with single-electron wave functions */
-    double val = 0.0; 
     for ( size_t jj = 0; jj < size; jj++) // run over columns: 4 electrons
     {
         for ( size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
         {
-            if(jj == 0){
-                val = Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, jj, val);
-            } else {
-                val = Psi1(eta, r[ii], R[jj-1][ii]);
-                gsl_matrix_set(matrix, ii, jj, val);
-            }
+            gsl_matrix_set(matrix, ii, jj, orbital(R, r, eta, ii, jj));
 
         }
     
     }
     
+}
+
+void init_Slater_matrices(gsl_matrix *m1, gsl_matrix *m2, double eta, double r1[N2], double r2[N2], double R1[DIM][N2], double R2[DIM][N2]){
+    initialize_mat_contents(m1, eta, r1, R1); // init. determinant up
+    initialize_mat_contents(m2, eta, r2, R2); // init. determinant down
+}
+
+int k_delta(int i, int j)
+{
+    if(i==j) return 1;
+    else return 0;
+}
+
+double grad_orbital(double R[DIM][N2], double r[N2], double eta, int ii, int jj, int kk){
+// kk -> x, y, z (1,2,3)
+// jj -> orbital / electron
+// ii -> electron position 
+    if( jj == 0)
+    {
+        return -R[kk][ii]/ (eta * eta) * orbital(R, r, eta, ii, 0);
+    }
+    else
+    {
+        return orbital(R, r, eta, ii, 0) * (k_delta(jj, kk+1) - R[kk][ii] * R[jj-1][ii]/pow(eta, 2.0));
+    }
+
+}
+
+void initialize_grad_mat(gsl_matrix* grad_mat[], double R[DIM][N2], double r[N2], double eta)
+{
+    for(int kk = 0; kk < DIM; kk++)
+    {
+        for(int ii = 0; ii < N2; ii++)
+        {
+            for(int jj = 0; jj < N2; jj++)
+                gsl_matrix_set(grad_mat[kk], ii, jj, grad_orbital(R, r, eta, ii, jj, kk));
+        }
+    }
+}
+
+double laplacian_orbital(double R[DIM][N2], double r[N2] ,int ii, int jj, double eta)
+{
+    if(jj == 0)
+    {
+        return  orbital(R, r, eta, ii, 0)* (-3.0 + r[ii] * r[ii] / (eta * eta) ) / (eta * eta); 
+    }
+    else
+    {
+        return orbital(R, r, eta, ii, jj) * (-5.0 + r[ii] * r[ii]/ (eta * eta) ) / (eta * eta); 
+    }
+}
+
+void initialize_lap_mat(gsl_matrix* mat, double R[DIM][N2], double r[N2], double eta)
+{
+    for(int ii = 0; ii < N2; ii++)
+    {
+        for(int jj = 0; jj < N2; jj++)
+        {
+            gsl_matrix_set( mat, ii, jj, laplacian_orbital(R, r, ii, jj, eta) );
+        }
+    }
 }
 
 gsl_matrix *invert_a_matrix(gsl_matrix *matrix)
@@ -143,210 +227,96 @@ void print_mat_contents(gsl_matrix *matrix)
     for (i = 0; i < size; ++i) {
         for (j = 0; j < size; ++j) {
             element = gsl_matrix_get(matrix, i, j);
-            printf("%f ", element);
+            printf("%e \t", element);
         }
         printf("\n");
     }
 }
 
-int randomGenerator_int(int low, int up){
-    /* Generates random integer numbers in the range [low, up] */
-  return (rand() % (up - low + 1)) +low;
-}
-
-double randomGenerator_double(double low, double up){
-    double range = up - low;
-    double div = RAND_MAX / range;
-    return low + (rand()/div);
-}
-
-void init_Slater_matrices(gsl_matrix *m1, gsl_matrix *m2, double eta, double r1[N2], double r2[N2], double R1[DIM][N2], double R2[DIM][N2]){
-    initialize_mat_contents(m1, eta, r1, R1); // init. determinant up
-    initialize_mat_contents(m2, eta, r2, R2); // init. determinant down
-}
-
-void gradient_of_matrix_x(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
-{   /* Calculates one component of the gradient of the matrix */
-    double val = 0.0;
-
-        for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
-        {
-                val = - R[0][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 0, val);
-                
-                val = ( 1.0 - R[0][ii] * R[0][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 1, val);
-
-                val = - R[0][ii] * R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 2, val);
-                            
-                val = - R[0][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 3, val);
-                    
-        }
-}
-
-void gradient_of_matrix_y(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
-{   /* Calculates one component of the gradient of the matrix */
-    double val = 0.0;
-
-        for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
-        {
-                val = - R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 0, val);
-                
-                val = - R[0][ii] * R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 1, val);
-
-                val = ( 1.0 - R[1][ii] * R[1][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 2, val);
-                            
-                val = - R[1][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 3, val);
-                    
-        }
-}
-
-void gradient_of_matrix_z(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
-{   /* Calculates one component of the gradient of the matrix */
-    double val = 0.0;
-
-        for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
-        {
-                val = - R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 0, val);
-                
-                val = - R[0][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 1, val);
-
-                val = - R[1][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 2, val);
-                            
-                val = ( 1.0 - R[2][ii] * R[2][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
-                gsl_matrix_set(matrix, ii, 3, val);
-                    
-        }
-}
-
-void laplacian_of_matrix(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
-{   /* Calculated the laplacian of the matrix */
-    double val;
-      
-        for (size_t ii = 0; ii < size; ii++)
-        {   val = 0.0;
-                val = Psi0(eta, r[ii]) / (eta * eta) * (-3.0 + r[ii] * r[ii] / (eta * eta) );
-                gsl_matrix_set(matrix, ii, 0, val);
-                val = Psi0(eta, r[ii]) * R[0][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
-                gsl_matrix_set(matrix, ii, 1, val);
-                val = Psi0(eta, r[ii]) * R[1][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
-                gsl_matrix_set(matrix, ii, 2, val);
-                val = Psi0(eta, r[ii]) * R[2][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
-                gsl_matrix_set(matrix, ii, 3, val);
-        }
-    
-}
-    
-void GDtoDR(gsl_matrix *m1, gsl_matrix *m2, gsl_matrix *m3 , gsl_matrix *detInv, double GDratio[DIM][N2])
-{   /* Calculates the gradient determinant-to-determinant ratio when no move is performed */
-    double val = 0.0, inv = 0.0;
-    double totx= 0.0, toty = 0.0, totz = 0.0;
-    for (size_t ii = 0; ii < 4; ii++) // run over rows : position of electrons
-        {  
-            totx = toty = totz = 0.0;
-            for (size_t jj = 0; jj < size; jj++) // run over column : electrons
-            {   // product row by row
-                //  printf("val[%zu][%zu]: %lf \t inv[%zu][%zu]: %lf\t v*i: %lf\t tot: %lf\n", ii, jj, val, ii, jj, inv, val*inv, totz);
-                val =  gsl_matrix_get(m1, ii, jj);  inv = gsl_matrix_get(detInv, jj, ii );
-                totx += val *inv;
-                GDratio[0][ii] = totx; // x-component
-                
-                val =  gsl_matrix_get(m2, ii, jj);
-                toty += val *inv;
-                GDratio[1][ii] = toty; // y-component
-                
-                val = gsl_matrix_get(m3, ii, jj);
-                totz += val * inv;
-                GDratio[2][ii] = totz; // z-component
-            }
-  
-    }
-
-}
-
-void LDtoDR(gsl_matrix *mm, gsl_matrix *detInv, double LDratio[N2])
-{   /* Calculated the laplacian determinant-to determinant ratio */
-    double val, inv, tot;
-    for (size_t ii = 0; ii < size; ii++) // run over rows
-    {   tot = 0.0;
-        for (size_t jj = 0; jj < size; jj++) // run over columns
-        {   val = gsl_matrix_get(mm, ii, jj);   inv = gsl_matrix_get(detInv, jj, ii);
-            tot += val*inv;
-        }
-    LDratio[ii] = tot;
-    }
-    
-}
-
-double localEnergy1( double LDtoDRup[N2], double LDtoDRdown[N2]){
+double localEnergy1(gsl_matrix* Aup, gsl_matrix* Adown, double Rup[DIM][N2], double Rdown[DIM][N2], double r1[N2], double r2[N2], double eta){
     /* First way to implement the calculation of the local kinetic energy */
-   double val = 0.0;
-    for (int ii = 0; ii < N2; ii++)
+   
+    gsl_matrix* lapl_Aup = gsl_matrix_alloc(N2 , N2);
+    initialize_lap_mat(lapl_Aup, Rup, r1, eta);
+    gsl_matrix* lapl_Adown = gsl_matrix_alloc(N2, N2);
+    initialize_lap_mat(lapl_Adown, Rdown, r2, eta);
+
+    gsl_matrix* inv_Aup = invert_a_matrix(Aup);
+    gsl_matrix* inv_Adown = invert_a_matrix(Adown);
+
+    double sum = 0;
+    for(int ii = 0; ii < N2; ii++)
     {
-             val += LDtoDRup[ii] +  LDtoDRdown[ii];
+        for(int jj = 0; jj < N2; jj++)
+        {
+            sum += gsl_matrix_get(lapl_Aup, ii, jj) * gsl_matrix_get(inv_Aup, jj, ii);
+            sum += gsl_matrix_get(lapl_Adown, ii, jj) * gsl_matrix_get(inv_Adown, jj, ii);
+        }
     }
-    return -1.0/2.0 * val;
+
+    gsl_matrix_free(inv_Aup);
+    gsl_matrix_free(inv_Adown);
+    gsl_matrix_free(lapl_Aup);
+    gsl_matrix_free(lapl_Adown);
+
+    return -0.5 * sum;
 }
 
-double localEnergy1_b(gsl_matrix *lapUp, gsl_matrix *lapDown, gsl_matrix *detIup, gsl_matrix *detIdown, gsl_matrix *gradUpx, gsl_matrix *gradUpy, gsl_matrix *gradUpz, gsl_matrix *gradDownx, gsl_matrix *gradDowny, gsl_matrix *gradDownz){
-    double val = 0.0, lap = 0.0, detI = 0.0, val2 = 0.0;;
-    for (size_t ii = 0; ii < N; ii++)
+double localEnergy2(gsl_matrix* Aup, gsl_matrix* Adown, double Rup[DIM][N2], double Rdown[DIM][N2], double r1[N2], double r2[N2], double eta){
+     // Matrices of laplacians
+    gsl_matrix* grad_Aup[DIM] = {gsl_matrix_alloc(N2, N2), gsl_matrix_alloc(N2, N2), gsl_matrix_alloc(N2, N2)};
+    initialize_grad_mat(grad_Aup, Rup, r1, eta );
+    gsl_matrix* grad_Adown[DIM] = {gsl_matrix_alloc(N2, N2), gsl_matrix_alloc(N2, N2), gsl_matrix_alloc(N2, N2)};
+    initialize_grad_mat(grad_Adown, Rdown, r2, eta );
+
+    double sum = 0.0, temp = 0.0;
+    // Inverse matrices
+    gsl_matrix* inv_Aup = invert_a_matrix(Aup);
+    gsl_matrix* inv_Adown = invert_a_matrix(Adown);
+    for(int kk = 0; kk < DIM; kk++)
     {
-        if (ii < N2)
+        for(int ii = 0; ii < N2; ii++)
         {
-            for (int jj = 0; jj < N2; jj++)
+            for(int jj = 0; jj < N2; jj++)
             {
-                lap = gsl_matrix_get(lapUp, ii, jj);
-                detI = gsl_matrix_get(detIup, ii, jj);
-                val += lap * detI;
-                val2 += gsl_matrix_get(gradUpx, 0, jj) * gsl_matrix_get(gradUpx, 0, jj) + gsl_matrix_get(gradUpx, 1, jj) * gsl_matrix_get(gradUpx, 1, jj) + gsl_matrix_get(gradUpx, 2, jj) * gsl_matrix_get(gradUpx, 2, jj);
-            } 
-            
-        } else {
-            for (size_t jj = 0; jj < N2; jj++)
-            {
-                lap = gsl_matrix_get(lapDown, ii-4, jj);
-                detI = gsl_matrix_get(detIdown, ii-4, jj);
-                val += lap * detI;
-                val2 += gsl_matrix_get(gradDownx, 0, jj) * gsl_matrix_get(gradDownx, 0, jj) + gsl_matrix_get(gradDownx, 1, jj) * gsl_matrix_get(gradDownx, 1, jj) + gsl_matrix_get(gradUpx, 2, jj) * gsl_matrix_get(gradDownx, 2, jj);
+                for(int ll = 0; ll < N2; ll++)
+                {
+                    sum += gsl_matrix_get(grad_Aup[kk], ii, jj) * gsl_matrix_get(inv_Aup, jj, ii) * gsl_matrix_get(grad_Aup[kk], ii, ll) * gsl_matrix_get(inv_Aup, ll, ii);
+                    sum += gsl_matrix_get(grad_Adown[kk], ii, jj) * gsl_matrix_get(inv_Adown, jj, ii)* gsl_matrix_get(grad_Adown[kk], ii, ll) * gsl_matrix_get(inv_Adown, ll, ii);
+                } 
             }
         }
-    
-    }
-    return -0.25 * (val - val2);
-}
-
-double localEnergy2(double LDtoDRup[N2], double LDtoDRdown[N2], double GDtoDRup[DIM][N2], double GDtoDRdown[DIM][N2])
-{ /* Second way to implement the calculation of the local kinetic energy */
-
-    double val1 = 0.0;
-    double val2 = 0.0;
-    for (int ii = 0; ii < N2; ii++)
-    {
-             val1 += LDtoDRup[ii] +  LDtoDRdown[ii];
     }
 
-    for (int jj = 0; jj < N; jj++)
-    {  
-        if (jj < N2)
-        {
-            val2 += GDtoDRup[0][jj] * GDtoDRup[0][jj]  + GDtoDRup[1][jj] * GDtoDRup[1][jj] + GDtoDRup[2][jj] * GDtoDRup[2][jj]; 
-        } else {
-            val2 += GDtoDRdown[0][jj-4] * GDtoDRdown[0][jj-4]  + GDtoDRdown[1][jj-4] * GDtoDRdown[1][jj-4] + GDtoDRdown[2][jj-4] * GDtoDRdown[2][jj-4]; 
-        }
+    // for(int kk = 0; kk < DIM; kk ++) //i
+    // {
+    //     temp = 0;
+    //     for(int ii = 0; ii < N2; ii++) // j
+    //     {
+    //         for(int jj = 0; jj < N2; jj++) // k
+    //         {
+    //             double a = gsl_matrix_get(grad_Aup[kk], ii, jj) * gsl_matrix_get(inv_Aup, jj, ii);
+    //             double b = gsl_matrix_get(grad_Adown[kk], ii, jj)*gsl_matrix_get(inv_Adown, jj, ii);
+    //             temp += a + b;
         
+    //         }
+    //         //sum += temp;
+    //         //cout << sum << endl;
+    //     }
+    //     sum += temp*temp;
+
+    // }
+
+    gsl_matrix_free(inv_Aup);
+    gsl_matrix_free(inv_Adown);
+    for(int ii=0; ii < DIM; ii++)
+    {
+        gsl_matrix_free(grad_Aup[ii]);
+        gsl_matrix_free(grad_Adown[ii]);
     }
- 
-    return 1.0 / 4.0 * (- val1 + val2);
+
+
+    return 0.5 * sum;
 }
 
 double determinant_of_matrix(gsl_matrix *matrix)
@@ -362,21 +332,207 @@ double determinant_of_matrix(gsl_matrix *matrix)
     gsl_permutation_free(p);
     return detMat;
 }
+// -----------------------------------------------------------------------------------
 
-void getRatio(gsl_matrix *matrix, gsl_matrix *detInv, double ratio[N2] ){
-   
-    double val = 0.0; 
-    double inv = 0.0;
-    double tot = 0.0;
-    for (size_t ii = 0; ii < size; ii++)
-    {   tot = 0.0;
-        for (size_t jj = 0; jj < size; jj++)
-        {
-            val = gsl_matrix_get(matrix, ii, jj);   inv = gsl_matrix_get(detInv, ii, jj);
-            tot += val*inv;
-            printf("val: %lf\t inv: %lf\t tot: %lf\n", val, inv, tot);
-        }
-        ratio[ii] = tot;
-    }
+
+// int randomGenerator_int(int low, int up){
+//     /* Generates random integer numbers in the range [low, up] */
+//   return (rand() % (up - low + 1)) +low;
+// }
+
+// double randomGenerator_double(double low, double up){
+//     double range = up - low;
+//     double div = RAND_MAX / range;
+//     return low + (rand()/div);
+// }
+
+
+
+// void gradient_of_matrix_x(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
+// {   /* Calculates one component of the gradient of the matrix */
+//     double val = 0.0;
+
+//         for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
+//         {
+//                 val = - R[0][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 0, val);
+                
+//                 val = ( 1.0 - R[0][ii] * R[0][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 1, val);
+
+//                 val = - R[0][ii] * R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 2, val);
+                            
+//                 val = - R[0][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 3, val);
+                    
+//         }
+// }
+
+// void gradient_of_matrix_y(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
+// {   /* Calculates one component of the gradient of the matrix */
+//     double val = 0.0;
+
+//         for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
+//         {
+//                 val = - R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 0, val);
+                
+//                 val = - R[0][ii] * R[1][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 1, val);
+
+//                 val = ( 1.0 - R[1][ii] * R[1][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 2, val);
+                            
+//                 val = - R[1][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 3, val);
+                    
+//         }
+// }
+
+// void gradient_of_matrix_z(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
+// {   /* Calculates one component of the gradient of the matrix */
+//     double val = 0.0;
+
+//         for (size_t ii = 0; ii < size; ii++) // run over rows : 4 positions of electrons
+//         {
+//                 val = - R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 0, val);
+                
+//                 val = - R[0][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 1, val);
+
+//                 val = - R[1][ii] * R[2][ii]/ (eta * eta) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 2, val);
+                            
+//                 val = ( 1.0 - R[2][ii] * R[2][ii] / (eta * eta) ) * Psi0(eta, r[ii]);
+//                 gsl_matrix_set(matrix, ii, 3, val);
+                    
+//         }
+// }
+
+// void laplacian_of_matrix(gsl_matrix *matrix, double eta, double r[N2], double R[DIM][N2])
+// {   /* Calculated the laplacian of the matrix */
+//     double val;
+      
+//         for (size_t ii = 0; ii < size; ii++)
+//         {   val = 0.0;
+//                 val = Psi0(eta, r[ii]) / (eta * eta) * (-3.0 + r[ii] * r[ii] / (eta * eta) );
+//                 gsl_matrix_set(matrix, ii, 0, val);
+//                 val = Psi0(eta, r[ii]) * R[0][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
+//                 gsl_matrix_set(matrix, ii, 1, val);
+//                 val = Psi0(eta, r[ii]) * R[1][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
+//                 gsl_matrix_set(matrix, ii, 2, val);
+//                 val = Psi0(eta, r[ii]) * R[2][ii] / (eta * eta) * (-5.0 + r[ii] * r[ii]/ (eta * eta) );
+//                 gsl_matrix_set(matrix, ii, 3, val);
+//         }
     
-}
+// }
+    
+// void GDtoDR(gsl_matrix *m1, gsl_matrix *m2, gsl_matrix *m3 , gsl_matrix *detInv, double GDratio[DIM][N2])
+// {   /* Calculates the gradient determinant-to-determinant ratio when no move is performed */
+//     double val = 0.0, inv = 0.0;
+//     double totx= 0.0, toty = 0.0, totz = 0.0;
+//     for (size_t ii = 0; ii < size; ii++) // run over rows : position of electrons
+//     {  totx = toty = totz = 0.0;
+//             for (size_t jj = 0; jj < size; jj++) // run over column : electrons
+//             {  
+//                 //  printf("val[%zu][%zu]: %lf \t inv[%zu][%zu]: %lf\t v*i: %lf\t tot: %lf\n", ii, jj, val, ii, jj, inv, val*inv, totz);
+//                 val =  gsl_matrix_get(m1, ii, jj);  inv = gsl_matrix_get(detInv, jj, ii );
+//                 totx += val *inv;
+            
+//                 val =  gsl_matrix_get(m2, ii, jj);
+//                 toty += val *inv;
+                
+//                 val = gsl_matrix_get(m3, ii, jj);
+//                 totz += val * inv;
+                
+//             }
+//             GDratio[0][ii] = totx; // x-component
+//             GDratio[1][ii] = toty; // y-component
+//             GDratio[2][ii] = totz; // z-component
+  
+//     }
+
+// }
+
+// void LDtoDR(gsl_matrix *mm, gsl_matrix *detInv, double LDratio[N2])
+// {   /* Calculated the laplacian determinant-to determinant ratio */
+//     double val, inv, tot;
+//     for (size_t ii = 0; ii < size; ii++) // run over rows
+//     {   tot = 0.0;
+//         for (size_t jj = 0; jj < size; jj++) // run over columns
+//         {   val = gsl_matrix_get(mm, ii, jj);   inv = gsl_matrix_get(detInv, jj, ii);
+//             tot += val*inv;
+//         }
+//     LDratio[ii] = tot;
+//     }
+    
+// }
+
+
+
+// double localEnergy2(double LDtoDRup[N2], double LDtoDRdown[N2], double GDtoDRup[DIM][N2], double GDtoDRdown[DIM][N2])
+// { /* Second way to implement the calculation of the local kinetic energy */
+
+//     double val1 = 0.0;
+//     double val2[4];
+//     double GD[3][4];
+//     double sum = 0.0;
+//     for (int ii = 0; ii < DIM; ii++)
+//     {
+//         val2[ii] = 0.0;
+        
+//     }
+    
+//     for (int ii = 0; ii < N2; ii++)
+//     {
+//              val1 += LDtoDRup[ii] +  LDtoDRdown[ii];
+//     }
+
+//     for (int jj = 0; jj < N2; jj++)
+//     {  
+//        for (int ii = 0; ii < DIM; ii++)
+//        {
+//             GD[ii][jj] = GDtoDRup[ii][jj] + GDtoDRdown[ii][jj];
+//        }
+//     }
+
+//     for (int jj = 0; jj < N2; jj++)
+//     {
+//         for (int ii = 0; ii < DIM; ii++)
+//         {
+//             val2[jj] += GD[ii][jj] * GD[ii][jj];
+//         }
+        
+//     }
+
+//     for (int ii = 0; ii < N2; ii++)
+//     {
+//         sum += val2[ii];
+//     }
+    
+    
+ 
+//     return 1.0 / 4.0 * (- val1 + sum);
+// }
+
+
+// void getRatio(gsl_matrix *matrix, gsl_matrix *detInv, double ratio[N2] ){
+   
+//     double val = 0.0; 
+//     double inv = 0.0;
+//     double tot = 0.0;
+//     for (size_t ii = 0; ii < size; ii++)
+//     {   tot = 0.0;
+//         for (size_t jj = 0; jj < size; jj++)
+//         {
+//             val = gsl_matrix_get(matrix, ii, jj);   inv = gsl_matrix_get(detInv, ii, jj);
+//             tot += val*inv;
+//             printf("val: %lf\t inv: %lf\t tot: %lf\n", val, inv, tot);
+//         }
+//         ratio[ii] = tot;
+//     }
+    
+// }
+

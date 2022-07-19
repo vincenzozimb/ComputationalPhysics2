@@ -153,7 +153,6 @@ projects/Ex3/clean: projects/Ex3/CMakeFiles/dft8.dir/clean
 # Directory level rules for directory projects/Ex4
 
 # Recursive "all" directory target.
-projects/Ex4/all: projects/Ex4/CMakeFiles/test1.dir/all
 projects/Ex4/all: projects/Ex4/CMakeFiles/mcel.dir/all
 projects/Ex4/all: projects/Ex4/CMakeFiles/mc1d.dir/all
 projects/Ex4/all: projects/Ex4/CMakeFiles/mc3d.dir/all
@@ -164,8 +163,6 @@ projects/Ex4/preinstall:
 .PHONY : projects/Ex4/preinstall
 
 # Recursive "clean" directory target.
-projects/Ex4/clean: projects/Ex4/CMakeFiles/run-ex4-test1.dir/clean
-projects/Ex4/clean: projects/Ex4/CMakeFiles/test1.dir/clean
 projects/Ex4/clean: projects/Ex4/CMakeFiles/mcel.dir/clean
 projects/Ex4/clean: projects/Ex4/CMakeFiles/mc1d.dir/clean
 projects/Ex4/clean: projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/clean
@@ -657,58 +654,6 @@ dft8: projects/Ex3/CMakeFiles/dft8.dir/rule
 projects/Ex3/CMakeFiles/dft8.dir/clean:
 	$(MAKE) $(MAKESILENT) -f projects/Ex3/CMakeFiles/dft8.dir/build.make projects/Ex3/CMakeFiles/dft8.dir/clean
 .PHONY : projects/Ex3/CMakeFiles/dft8.dir/clean
-
-#=============================================================================
-# Target rules for target projects/Ex4/CMakeFiles/run-ex4-test1.dir
-
-# All Build rule for target.
-projects/Ex4/CMakeFiles/run-ex4-test1.dir/all: projects/Ex4/CMakeFiles/test1.dir/all
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/depend
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles --progress-num= "Built target run-ex4-test1"
-.PHONY : projects/Ex4/CMakeFiles/run-ex4-test1.dir/all
-
-# Build rule for subdir invocation for target.
-projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles 11
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-test1.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles 0
-.PHONY : projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
-
-# Convenience name for target.
-run-ex4-test1: projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
-.PHONY : run-ex4-test1
-
-# clean rule for target.
-projects/Ex4/CMakeFiles/run-ex4-test1.dir/clean:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/clean
-.PHONY : projects/Ex4/CMakeFiles/run-ex4-test1.dir/clean
-
-#=============================================================================
-# Target rules for target projects/Ex4/CMakeFiles/test1.dir
-
-# All Build rule for target.
-projects/Ex4/CMakeFiles/test1.dir/all: myfunc/CMakeFiles/myfunc.dir/all
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/depend
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles --progress-num=36,37 "Built target test1"
-.PHONY : projects/Ex4/CMakeFiles/test1.dir/all
-
-# Build rule for subdir invocation for target.
-projects/Ex4/CMakeFiles/test1.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles 11
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/test1.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build/CMakeFiles 0
-.PHONY : projects/Ex4/CMakeFiles/test1.dir/rule
-
-# Convenience name for target.
-test1: projects/Ex4/CMakeFiles/test1.dir/rule
-.PHONY : test1
-
-# clean rule for target.
-projects/Ex4/CMakeFiles/test1.dir/clean:
-	$(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/clean
-.PHONY : projects/Ex4/CMakeFiles/test1.dir/clean
 
 #=============================================================================
 # Target rules for target projects/Ex4/CMakeFiles/mcel.dir

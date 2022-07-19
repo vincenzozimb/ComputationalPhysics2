@@ -153,11 +153,29 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
   /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_pow_int.h \
   /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_minmax.h \
   /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_blas.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/string.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_rsize_t.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/strings.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/secure/_strings.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/secure/_string.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/time.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_clock_t.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_time_t.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_timespec.h \
+  ../projects/Ex4/util.h \
   ../myfunc/print_routines.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/complex.h
 
 
 ../myfunc/print_routines.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_time_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/time.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/secure/_strings.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_rsize_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/float.h:
 
@@ -307,6 +325,8 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types.h:
 
+../projects/Ex4/util.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_va_list.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/appleapiopts.h:
@@ -383,6 +403,8 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_u_int64_t.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/strings.h:
+
 /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_block_uint.h:
 
 /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_blas_types.h:
@@ -394,6 +416,8 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
 /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_block_float.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_uintptr_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_clock_t.h:
 
 /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_vector_short.h:
 
@@ -411,6 +435,8 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/stdio.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/string.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/machine/types.h:
 
 /opt/homebrew/Cellar/gsl/2.6/include/gsl/gsl_nan.h:
@@ -425,9 +451,13 @@ projects/Ex4/CMakeFiles/test1.dir/test1.c.o: ../projects/Ex4/test1.c \
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_ct_rune_t.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/secure/_string.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/arm/types.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/secure/_stdio.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/sys/_types/_timespec.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/Availability.h:
 

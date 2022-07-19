@@ -78,8 +78,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "projects/Ex3/CMakeFiles/dft20.dir/DependInfo.cmake"
   "projects/Ex3/CMakeFiles/run-ex3-8.dir/DependInfo.cmake"
   "projects/Ex3/CMakeFiles/dft8.dir/DependInfo.cmake"
-  "projects/Ex4/CMakeFiles/run-ex4-test1.dir/DependInfo.cmake"
-  "projects/Ex4/CMakeFiles/test1.dir/DependInfo.cmake"
   "projects/Ex4/CMakeFiles/mcel.dir/DependInfo.cmake"
   "projects/Ex4/CMakeFiles/mc1d.dir/DependInfo.cmake"
   "projects/Ex4/CMakeFiles/run-ex4-mc1d.dir/DependInfo.cmake"

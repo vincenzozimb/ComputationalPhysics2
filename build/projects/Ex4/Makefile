@@ -117,34 +117,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
-.PHONY : projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
-
-# Convenience name for target.
-run-ex4-test1: projects/Ex4/CMakeFiles/run-ex4-test1.dir/rule
-.PHONY : run-ex4-test1
-
-# fast build rule for target.
-run-ex4-test1/fast:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/run-ex4-test1.dir/build.make projects/Ex4/CMakeFiles/run-ex4-test1.dir/build
-.PHONY : run-ex4-test1/fast
-
-# Convenience name for target.
-projects/Ex4/CMakeFiles/test1.dir/rule:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/test1.dir/rule
-.PHONY : projects/Ex4/CMakeFiles/test1.dir/rule
-
-# Convenience name for target.
-test1: projects/Ex4/CMakeFiles/test1.dir/rule
-.PHONY : test1
-
-# fast build rule for target.
-test1/fast:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/build
-.PHONY : test1/fast
-
-# Convenience name for target.
 projects/Ex4/CMakeFiles/mcel.dir/rule:
 	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 projects/Ex4/CMakeFiles/mcel.dir/rule
 .PHONY : projects/Ex4/CMakeFiles/mcel.dir/rule
@@ -300,30 +272,6 @@ mcel.c.s:
 	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/mcel.dir/build.make projects/Ex4/CMakeFiles/mcel.dir/mcel.c.s
 .PHONY : mcel.c.s
 
-test1.o: test1.c.o
-.PHONY : test1.o
-
-# target to build an object file
-test1.c.o:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.o
-.PHONY : test1.c.o
-
-test1.i: test1.c.i
-.PHONY : test1.i
-
-# target to preprocess a source file
-test1.c.i:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.i
-.PHONY : test1.c.i
-
-test1.s: test1.c.s
-.PHONY : test1.s
-
-# target to generate assembly for a file
-test1.c.s:
-	cd /Users/teresa/Desktop/Repositories/ComputationalPhysics2/build && $(MAKE) $(MAKESILENT) -f projects/Ex4/CMakeFiles/test1.dir/build.make projects/Ex4/CMakeFiles/test1.dir/test1.c.s
-.PHONY : test1.c.s
-
 util.o: util.c.o
 .PHONY : util.o
 
@@ -359,11 +307,9 @@ help:
 	@echo "... run-ex4-mc1d"
 	@echo "... run-ex4-mc3d"
 	@echo "... run-ex4-mcel"
-	@echo "... run-ex4-test1"
 	@echo "... mc1d"
 	@echo "... mc3d"
 	@echo "... mcel"
-	@echo "... test1"
 	@echo "... mc1d.o"
 	@echo "... mc1d.i"
 	@echo "... mc1d.s"
@@ -373,9 +319,6 @@ help:
 	@echo "... mcel.o"
 	@echo "... mcel.i"
 	@echo "... mcel.s"
-	@echo "... test1.o"
-	@echo "... test1.i"
-	@echo "... test1.s"
 	@echo "... util.o"
 	@echo "... util.i"
 	@echo "... util.s"

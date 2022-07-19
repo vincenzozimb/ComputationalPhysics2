@@ -49,16 +49,5 @@ WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/plotEl.gp
 DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-###########################################################
-add_executable(test1 test1.c )
 
-target_compile_options(test1 PRIVATE -Wall -O3)
-find_package(GSL REQUIRED)
-target_link_libraries(test1 m myfunc lapack GSL::gsl GSL::gslcblas)
 
-# add custom commands
-add_custom_target(run-ex4-test1
-COMMAND test1 && gnuplot plotEL.gp
-DEPENDS test1 
-WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
-)
